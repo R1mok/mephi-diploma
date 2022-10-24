@@ -1,0 +1,25 @@
+package ru.b19513.pet_manager.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import ru.b19513.pet_manager.repository.UserRepository;
+
+@Service("userDetailsServiceImpl")
+public class userDetailsServiceImpl implements UserDetailsService {
+
+    private final UserRepository userRepository;
+
+    @Autowired
+    public userDetailsServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        return userRepository.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("Not founded"));
+    }
+}
