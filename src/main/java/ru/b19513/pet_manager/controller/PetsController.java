@@ -8,14 +8,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.b19513.pet_manager.controller.entity.FeedNoteDTO;
 import ru.b19513.pet_manager.controller.entity.PetDTO;
+import ru.b19513.pet_manager.controller.entity.PetParametersDTO;
 import ru.b19513.pet_manager.controller.entity.StatusDTO;
 import ru.b19513.pet_manager.controller.entity.enums.Gender;
 import ru.b19513.pet_manager.controller.entity.enums.PetType;
 import ru.b19513.pet_manager.repository.entity.User;
 import ru.b19513.pet_manager.service.PetService;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/pets")
@@ -82,5 +85,14 @@ public class PetsController {
                                                                        @RequestParam LocalDateTime to) {
         Collection<FeedNoteDTO> feedNoteDTOCollection = petService.findFeedNotesByDate(petId, from, to);
         return ResponseEntity.ok(feedNoteDTOCollection);
+    }
+
+    @Operation(summary = "Добавить запись о росте и весе")
+    @PostMapping("/parameters/add")
+    public ResponseEntity<PetDTO> addParametersOfPet(@RequestParam long petId,
+                                                                     @RequestParam double weight,
+                                                                     @RequestParam double height) {
+        return ResponseEntity.ok(petService.addNewParameter(petId, Instant.now(), weight, height));
+
     }
 }

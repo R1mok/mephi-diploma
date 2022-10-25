@@ -42,7 +42,7 @@ public class Pet {
     @Column
     private Set<Notification> notifications;
 
-    @OneToMany
+    @OneToMany(cascade=CascadeType.ALL)
     @Column
     private List<PetParameters> petParameters;
 }

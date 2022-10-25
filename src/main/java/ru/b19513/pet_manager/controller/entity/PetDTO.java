@@ -24,5 +24,5 @@ public class PetDTO implements Serializable {
     @Schema(description = "Пол питомца")
     private Gender gender;
     @Schema(description = "Список замеров роста и веса питомца")
-    private List<PetParametersDTO> parametersDTOS;
+    private List<PetParametersDTO> petParametersDTO;
 }
