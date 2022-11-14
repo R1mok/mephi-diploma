@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">PetSchedule</string>
+    <string name="title_activity_group">GroupActivity</string>
+</resources>
