@@ -51,12 +51,11 @@ private fun PetScheduleMain() {
         ) {
             Card(
                 modifier = Modifier
-                    .offset(y = 200.dp),
+                    .offset(y = 100.dp),
                 shape = RoundedCornerShape(15.dp)
             ) {
                 Text(
                     text = "Управелние питомцами",
-
                     style = TextStyle(fontSize = 25.sp, color = Color.Blue),
                     modifier = Modifier
                         .background(color = Color.White)
@@ -64,7 +63,37 @@ private fun PetScheduleMain() {
                 )
             }
             Button(
-                modifier = Modifier.offset(y = 400.dp),
+                onClick = {
+                    context.startActivity(Intent(context, LoginActivity::class.java))
+                },
+                modifier = Modifier.offset(y = 400.dp).fillMaxWidth(0.9f),
+                shape = RoundedCornerShape(15.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.White,
+                    contentColor = Color.Gray
+                ),
+            ) {
+                Text(
+                    text = "Войти в аккаунт",
+                    style = TextStyle(fontSize = 25.sp, color = Color.Blue)
+                )
+            }
+            Button(
+                onClick = {  },
+                modifier = Modifier.offset(y = 500.dp).fillMaxWidth(0.9f),
+                shape = RoundedCornerShape(15.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.White,
+                    contentColor = Color.Gray
+                ),
+            ) {
+                Text(
+                    text = "Регистрация пользователя",
+                    style = TextStyle(fontSize = 25.sp, color = Color.Blue)
+                )
+            }
+            Button(
+                modifier = Modifier.offset(y = 600.dp).fillMaxWidth(0.9f),
                 onClick = {
                     context.startActivity(Intent(context, GroupActivity::class.java))
                 },
@@ -82,8 +111,4 @@ private fun PetScheduleMain() {
             }
         }
     }
-}
-
-private fun getGroups() {
-
 }

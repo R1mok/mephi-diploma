@@ -26,11 +26,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.volley.Header
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.android.volley.Request
-import com.android.volley.Response
 import org.json.JSONObject
 
 class GroupActivity : ComponentActivity() {
@@ -48,10 +45,10 @@ class GroupActivity : ComponentActivity() {
 @Composable
 private fun Groups() {
     val token =
-        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyMW1vayIsImlhdCI6MTY2ODQ0MjA4NCwiZXhwIjoxNjY5MDQ2ODg0fQ.DDLUxOwbD1KhIo6Gv-HINZ6iZGOCtEbZcC9hjWM5zr0";
+        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyMW1vayIsImlhdCI6MTY2ODUxNDA1NCwiZXhwIjoxNjY5MTE4ODU0fQ.3M3pVQ4ehW9SpZ2murk7K9p5Th9WLDB51zIrZnQPh00"
     val context = LocalContext.current
     val state = remember {
-        mutableStateOf("Unknown")
+        mutableStateOf(Group("", ""))
     }
     Box(
         modifier = Modifier
@@ -91,8 +88,8 @@ private fun Groups() {
                 .padding(vertical = 100.dp)
         ) {
             itemsIndexed(
-                listOf(state.value)
-            ) { index, item ->
+                listOf(state.value.id, state.value.name)
+            ) { _, item ->
                 Button(
                     onClick = { /*TODO*/ },
                     shape = RoundedCornerShape(15.dp),
@@ -103,7 +100,7 @@ private fun Groups() {
                     )
                 ) {
                     Text(
-                        text = "$index: $item",
+                        text = item,
                         color = Color.Blue,
                         fontSize = 30.sp,
                     )
@@ -117,29 +114,30 @@ private fun Groups() {
 private fun createGroup(
     token: String,
     name: String,
-    mState: MutableState<String>,
+    groupState: MutableState<Group>,
     context: Context
 ) {
-    var url = "https://localhost:8091/groups/create" +
+    var url = "http://localhost:8091/groups/create" +
             "?name=$name"
+    //val newUrl = "https://ya.ru"
     val queue = Volley.newRequestQueue(context)
-    val stringRequest = StringRequest(
-        Request.Method.POST,
+    val stringRequest = object : StringRequest(
+        Method.POST,
         url,
         { response ->
-            mState.value = response
+            var obj = JSONObject(response)
+            groupState.value = Group(obj.get("id").toString(), obj.get("name").toString())
         },
         {
             error ->
             Log.d("MyLog", "Error $error")
         })
-    /*{
+    {
         override fun getHeaders(): MutableMap<String, String> {
             val headers = HashMap<String, String>()
             headers["Authorization"] = token
             return headers
         }
-    }*/
-    stringRequest.headers
+    }
     queue.add(stringRequest)
 }
