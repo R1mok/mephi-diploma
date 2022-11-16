@@ -1,6 +1,5 @@
 package com.example.petschedule
 
-import android.app.ListActivity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -21,7 +20,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
+import androidx.navigation.NavController
+import com.example.petschedule.composables.LoginActivity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +35,7 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 private fun PetScheduleMain() {
+    var navController: NavController
     val context = LocalContext.current
     Box(
         modifier = Modifier
@@ -65,6 +66,7 @@ private fun PetScheduleMain() {
             Button(
                 onClick = {
                     context.startActivity(Intent(context, LoginActivity::class.java))
+
                 },
                 modifier = Modifier.offset(y = 400.dp).fillMaxWidth(0.9f),
                 shape = RoundedCornerShape(15.dp),
