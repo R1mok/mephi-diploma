@@ -1,10 +1,8 @@
 package com.example.petschedule.composables
 
 import android.content.Context
-import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,30 +23,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.android.volley.AuthFailureError
+import androidx.navigation.NavController
+import androidx.navigation.navArgument
+import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.User
+import org.json.JSONException
 import org.json.JSONObject
 
-class LoginActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            Login()
-        }
-    }
-}
 
-@Preview
 @Composable
-private fun Login() {
+fun LoginPage(navController: NavController) {
+
     var login by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
@@ -146,7 +137,7 @@ private fun Login() {
                     )
                     user.value.login = login
                     user.value.password = password
-                    authLogin(user, context)
+                    authLogin(user, context, navController)
                 }
             ) {
                 Text(
@@ -160,11 +151,14 @@ private fun Login() {
     }
 }
 
-private fun authLogin(user: MutableState<User>,
-                      context: Context
+private fun authLogin(
+    user: MutableState<User>,
+    context: Context,
+    navController: NavController
 ) {
-    var url = "http://localhost:8091/auth/login"
+    val url = "http://localhost:8091/auth/login"
 
+    var status = "403"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.POST,
@@ -173,11 +167,14 @@ private fun authLogin(user: MutableState<User>,
             var obj = JSONObject(response)
             user.value.token = obj.getString("token")
             Log.d("MyLog", "Token: ${user.value.token}")
+            if (status == "200")
+                navController.navigate(route = Screen.MainScreen.route)
         },
         { error ->
             Log.d("MyLog", "Error: $error")
-        })
-    {
+            if (status != "200")
+                navController.navigate(Screen.WrongCredentials.withArgs(status))
+        }) {
         override fun getBodyContentType(): String {
             return "application/json"
         }
@@ -189,6 +186,11 @@ private fun authLogin(user: MutableState<User>,
             params2["password"] = user.value.password
             return JSONObject(params2 as Map<*, *>).toString().toByteArray()
         }
+
+        override fun parseNetworkResponse(response: NetworkResponse): Response<String>? {
+            status = response.statusCode.toString()
+            return super.parseNetworkResponse(response)
+        }
     }
-    queue.add(stringRequest);
+    queue.add(stringRequest)
 }
