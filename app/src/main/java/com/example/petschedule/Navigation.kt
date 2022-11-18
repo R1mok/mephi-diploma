@@ -1,6 +1,7 @@
 package com.example.petschedule
 
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,10 +27,15 @@ fun Navigation() {
         startDestination = Screen.LoginPage.route
     ) {
         composable(route = Screen.MainScreen.route) {
+            BackHandler(true) {
+            }
             MainScreen(navController = navController)
         }
         composable(route = Screen.LoginPage.route) {
             LoginPage(navController = navController)
+        }
+        composable(route = Screen.MyGroups.route) {
+            MyGroups()
         }
         dialog(
             route = Screen.WrongCredentials.route + "/{status}",

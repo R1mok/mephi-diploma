@@ -18,89 +18,61 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.petschedule.R
 
+@Preview
+@Composable
+fun MainScreenPreview() {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .paint(
+            painter = painterResource(id = R.drawable.background),
+            contentScale = ContentScale.Crop
+        )) {
+        MainScreen(navController = rememberNavController())
+    }
+}
 
 @Composable
-fun MainScreen(navController : NavController) {
+fun MainScreen(navController: NavController) {
 
-    Box(
+    Column(
         modifier = Modifier
-            .paint(
-                painter = painterResource(id = R.drawable.background),
-                contentScale = ContentScale.Crop
-            )
-            .fillMaxSize()
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
+        Card(
             modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .offset(y = 100.dp),
+            shape = RoundedCornerShape(15.dp)
         ) {
-            Card(
+            Text(
+                text = "Управелние питомцами",
+                style = TextStyle(fontSize = 25.sp, color = Color.Blue),
                 modifier = Modifier
-                    .offset(y = 100.dp),
-                shape = RoundedCornerShape(15.dp)
-            ) {
-                Text(
-                    text = "Управелние питомцами",
-                    style = TextStyle(fontSize = 25.sp, color = Color.Blue),
-                    modifier = Modifier
-                        .background(color = Color.White)
-                        .padding(5.dp)
-                )
-            }
-            Button(
-                onClick = {  },
-                modifier = Modifier
-                    .offset(y = 400.dp)
-                    .fillMaxWidth(0.9f),
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.White,
-                    contentColor = Color.Gray
-                ),
-            ) {
-                Text(
-                    text = "Войти в аккаунт",
-                    style = TextStyle(fontSize = 25.sp, color = Color.Blue)
-                )
-            }
-            Button(
-                onClick = {  },
-                modifier = Modifier
-                    .offset(y = 500.dp)
-                    .fillMaxWidth(0.9f),
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.White,
-                    contentColor = Color.Gray
-                ),
-            ) {
-                Text(
-                    text = "Регистрация пользователя",
-                    style = TextStyle(fontSize = 25.sp, color = Color.Blue)
-                )
-            }
-            Button(
-                modifier = Modifier
-                    .offset(y = 600.dp)
-                    .fillMaxWidth(0.9f),
-                onClick = {
-                          navController.navigate(Screen.MyGroups.route)
-                },
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.White,
-                    contentColor = Color.Gray
-                ),
+                    .background(color = Color.White)
+                    .padding(5.dp)
+            )
+        }
+        Button(
+            modifier = Modifier
+                .offset(y = 600.dp)
+                .fillMaxWidth(0.9f),
+            onClick = {
+                navController.navigate(Screen.MyGroups.route)
+            },
+            shape = RoundedCornerShape(15.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.Gray
+            ),
 
-                ) {
-                Text(
-                    text = "Посмотреть свои группы",
-                    style = TextStyle(fontSize = 25.sp, color = Color.Blue)
-                )
-            }
+            ) {
+            Text(
+                text = "Посмотреть свои группы",
+                style = TextStyle(fontSize = 25.sp, color = Color.Blue)
+            )
         }
     }
 }
