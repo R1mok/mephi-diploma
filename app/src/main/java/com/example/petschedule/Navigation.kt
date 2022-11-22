@@ -37,6 +37,9 @@ fun Navigation() {
         composable(route = Screen.MyGroups.route) {
             MyGroups()
         }
+        composable(route = Screen.RegPage.route) {
+            RegPage(navController = navController)
+        }
         dialog(
             route = Screen.WrongCredentials.route + "/{status}",
             arguments = listOf(

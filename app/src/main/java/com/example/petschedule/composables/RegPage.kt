@@ -3,7 +3,6 @@ package com.example.petschedule.composables
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,37 +28,37 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.android.volley.*
+import com.android.volley.AuthFailureError
+import com.android.volley.NetworkResponse
+import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.entities.User
+import com.example.petschedule.entities.UserRegister
 import org.json.JSONObject
 
 @Preview
 @Composable
-fun LoginPagePreview() {
+fun RegPagePreview() {
     Box(modifier = Modifier
         .fillMaxSize()
         .paint(
             painter = painterResource(id = R.drawable.background),
             contentScale = ContentScale.Crop
         )) {
-        LoginPage(navController = rememberNavController())
+        RegPage(navController = rememberNavController())
     }
 }
 
 @Composable
-fun LoginPage(navController: NavController) {
-
+fun RegPage(navController: NavController) {
     var login by rememberSaveable { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
-    val token by rememberSaveable {
-        mutableStateOf("")
-    }
     var user = remember {
-        mutableStateOf(User(login, password, token))
+        mutableStateOf(UserRegister(login, password, name))
     }
     val context = LocalContext.current
     Column(
@@ -68,7 +67,7 @@ fun LoginPage(navController: NavController) {
             .fillMaxWidth()
     ) {
         Text(
-            text = "Вход в аккаунт",
+            text = "Регистрация",
             style = TextStyle(fontSize = 25.sp, color = Color.Blue),
             modifier = Modifier
                 .background(color = Color.White)
@@ -76,7 +75,7 @@ fun LoginPage(navController: NavController) {
         )
         Row(
             modifier = Modifier
-                .padding(vertical = 50.dp)
+                .padding(vertical = 25.dp)
                 .align(Alignment.CenterHorizontally)
         ) {
             OutlinedTextField(
@@ -90,6 +89,21 @@ fun LoginPage(navController: NavController) {
         }
         Row(
             modifier = Modifier
+                .padding(vertical = 25.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            OutlinedTextField(
+                value = name,
+                label = { Text(text = "Введите имя") },
+                textStyle = TextStyle(fontSize = 25.sp),
+                onValueChange = {
+                    name = it
+                },
+            )
+        }
+        Row(
+            modifier = Modifier
+                .padding(vertical = 25.dp)
                 .align(Alignment.CenterHorizontally)
         ) {
             OutlinedTextField(
@@ -124,16 +138,6 @@ fun LoginPage(navController: NavController) {
                 }
             )
         }
-        Text(
-            text = "Регистрация",
-            style = TextStyle(fontSize = 20.sp, color = Color.Blue),
-            modifier = Modifier
-                .background(color = Color.White)
-                .clickable {
-                    navController.navigate(route = Screen.RegPage.route)
-                }
-                .align(Alignment.CenterHorizontally)
-        )
         Button(
             modifier = Modifier
                 .fillMaxWidth(0.8f)
@@ -151,11 +155,12 @@ fun LoginPage(navController: NavController) {
                 )
                 user.value.login = login
                 user.value.password = password
-                authLogin(user, context, navController)
+                user.value.name = name
+                register(user, context, navController)
             }
         ) {
             Text(
-                text = "Войти",
+                text = "Зарегистрироваться",
                 style = TextStyle(fontSize = 25.sp, color = Color.Blue),
                 modifier = Modifier
                     .background(color = Color.White)
@@ -164,45 +169,35 @@ fun LoginPage(navController: NavController) {
     }
 }
 
-private fun authLogin(
-    user: MutableState<User>,
+
+private fun register(
+    user: MutableState<UserRegister>,
     context: Context,
     navController: NavController
 ) {
-    val url = "http://localhost:8091/auth/login"
-
-    var status = "403"
-
+    val url = "http://localhost:8091/user/register"
     val queue = Volley.newRequestQueue(context)
+    var status = "400"
     val stringRequest = object : StringRequest(
         Method.POST,
         url,
-        { response ->
-            var obj = JSONObject(response)
-            user.value.token = obj.getString("token")
-            Log.d("MyLog", "Token: ${user.value.token}")
+        { _ ->
             if (status == "200")
                 navController.navigate(route = Screen.MainScreen.route)
+            Log.d("MyLog", "Response")
         },
-        { error ->
+        {
+            error ->
             Log.d("MyLog", "Error: $error")
-            if (status != "200") {
-                status = "403"
-                navController.navigate(Screen.WrongCredentials.withArgs(status))
-            }
-        }) {
-        override fun getBodyContentType(): String {
-            return "application/json"
         }
-
-        @Throws(AuthFailureError::class)
-        override fun getBody(): ByteArray {
-            val params2 = HashMap<String, String>()
-            params2["login"] = user.value.login
-            params2["password"] = user.value.password
-            return JSONObject(params2 as Map<*, *>).toString().toByteArray()
+    ) {
+        override fun getParams(): Map<String, String> {
+            val params: MutableMap<String, String> = HashMap()
+            params["name"] = user.value.name
+            params["login"] = user.value.login
+            params["password"] = user.value.password
+            return params
         }
-
         override fun parseNetworkResponse(response: NetworkResponse): Response<String>? {
             status = response.statusCode.toString()
             return super.parseNetworkResponse(response)
