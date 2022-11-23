@@ -57,8 +57,8 @@ fun RegPage(navController: NavController) {
     var name by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
-    var user = remember {
-        mutableStateOf(UserRegister(login, password, name))
+    val user = remember {
+        mutableStateOf(User(login, password, name, ""))
     }
     val context = LocalContext.current
     Column(
@@ -171,37 +171,36 @@ fun RegPage(navController: NavController) {
 
 
 private fun register(
-    user: MutableState<UserRegister>,
+    user: MutableState<User>,
     context: Context,
     navController: NavController
 ) {
     val url = "http://localhost:8091/user/register"
     val queue = Volley.newRequestQueue(context)
-    var status = "400"
     val stringRequest = object : StringRequest(
         Method.POST,
         url,
         { _ ->
-            if (status == "200")
-                navController.navigate(route = Screen.MainScreen.route)
-            Log.d("MyLog", "Response")
+            authLogin(user, context, navController)
+            Log.d("MyLog", "Registered user: ${user.value.login}")
         },
         {
             error ->
-            Log.d("MyLog", "Error: $error")
+            if (error.networkResponse == null)
+                navController.navigate(Screen.WrongCredentials.withArgs("503"))
+            else if (error.networkResponse.statusCode == 400)
+                navController.navigate(Screen.LoginBusy.withArgs(user.value.login))
+            Log.d("MyLog", "Error: $error login: ${user.value.login}")
         }
     ) {
         override fun getParams(): Map<String, String> {
             val params: MutableMap<String, String> = HashMap()
             params["name"] = user.value.name
             params["login"] = user.value.login
-            params["password"] = user.value.password
+            params["pass"] = user.value.password
             return params
-        }
-        override fun parseNetworkResponse(response: NetworkResponse): Response<String>? {
-            status = response.statusCode.toString()
-            return super.parseNetworkResponse(response)
         }
     }
     queue.add(stringRequest)
 }
+

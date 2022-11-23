@@ -99,7 +99,7 @@ private fun createGroup(
     groupState: MutableState<Group>,
     context: Context
 ) {
-    var url = "http://localhost:8091/groups/create" +
+    val url = "http://localhost:8091/groups/create" +
             "?name=$name"
     //val newUrl = "https://ya.ru"
     val queue = Volley.newRequestQueue(context)

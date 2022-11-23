@@ -39,12 +39,14 @@ import org.json.JSONObject
 @Preview
 @Composable
 fun LoginPagePreview() {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .paint(
-            painter = painterResource(id = R.drawable.background),
-            contentScale = ContentScale.Crop
-        )) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .paint(
+                painter = painterResource(id = R.drawable.background),
+                contentScale = ContentScale.Crop
+            )
+    ) {
         LoginPage(navController = rememberNavController())
     }
 }
@@ -58,8 +60,8 @@ fun LoginPage(navController: NavController) {
     val token by rememberSaveable {
         mutableStateOf("")
     }
-    var user = remember {
-        mutableStateOf(User(login, password, token))
+    val user = remember {
+        mutableStateOf(User(login, password, "", token))
     }
     val context = LocalContext.current
     Column(
@@ -164,32 +166,32 @@ fun LoginPage(navController: NavController) {
     }
 }
 
-private fun authLogin(
+fun authLogin(
     user: MutableState<User>,
     context: Context,
     navController: NavController
 ) {
     val url = "http://localhost:8091/auth/login"
 
-    var status = "403"
-
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.POST,
         url,
         { response ->
-            var obj = JSONObject(response)
+            val obj = JSONObject(response)
             user.value.token = obj.getString("token")
             Log.d("MyLog", "Token: ${user.value.token}")
-            if (status == "200")
-                navController.navigate(route = Screen.MainScreen.route)
+            navController.navigate(Screen.MainScreen.route)
         },
         { error ->
-            Log.d("MyLog", "Error: $error")
-            if (status != "200") {
-                status = "403"
-                navController.navigate(Screen.WrongCredentials.withArgs(status))
-            }
+            val resp = error.networkResponse
+            val statusCode : Int
+            if (resp == null)
+                statusCode = 503
+            else
+                statusCode = resp.statusCode
+            Log.d("MyLog", "Error: $statusCode")
+            navController.navigate(Screen.WrongCredentials.withArgs(statusCode.toString()))
         }) {
         override fun getBodyContentType(): String {
             return "application/json"
@@ -201,11 +203,6 @@ private fun authLogin(
             params2["login"] = user.value.login
             params2["password"] = user.value.password
             return JSONObject(params2 as Map<*, *>).toString().toByteArray()
-        }
-
-        override fun parseNetworkResponse(response: NetworkResponse): Response<String>? {
-            status = response.statusCode.toString()
-            return super.parseNetworkResponse(response)
         }
     }
     queue.add(stringRequest)

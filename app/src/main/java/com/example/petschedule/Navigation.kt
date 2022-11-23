@@ -41,6 +41,37 @@ fun Navigation() {
             RegPage(navController = navController)
         }
         dialog(
+            route = Screen.LoginBusy.route + "/{login}",
+            arguments = listOf(
+                navArgument("login") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = true
+                }
+            ),
+            dialogProperties = DialogProperties(
+                dismissOnClickOutside = true,
+                dismissOnBackPress = true
+            )
+        ) {
+            entry -> entry.arguments?.getString("login")
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color.White)
+                    .padding(10.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color.White),
+            ) {
+                val text = "Такой логин уже существует"
+                Text(
+                    text = text,
+                    fontSize = 22.sp
+                )
+            }
+        }
+        dialog(
             route = Screen.WrongCredentials.route + "/{status}",
             arguments = listOf(
                 navArgument("status") {
@@ -54,7 +85,7 @@ fun Navigation() {
                 dismissOnClickOutside = true
             )
         ) {
-            entry -> entry.arguments?.getString("status")
+            entry -> val status = entry.arguments?.getString("status")
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -65,8 +96,10 @@ fun Navigation() {
                     .background(Color.White),
             ) {
                 val text : String
-                if (entry.toString() == "403") {
+                if (status.equals("403")) {
                     text = "Неверные логин или пароль"
+                } else if (status.equals("503")) {
+                    text = "Сервер недоступен"
                 } else {
                     text = "Пожалуйста, повторите попытку позже"
                 }
