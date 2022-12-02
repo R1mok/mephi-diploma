@@ -111,25 +111,6 @@ fun MyGroups(navController: NavController, token: String) {
                 )
             }
         }
-        /*itemsIndexed(
-            listOf(state.value.id, state.value.name)
-        ) { _, item ->
-            Button(
-                onClick = { *//*TODO*//* },
-                shape = RoundedCornerShape(15.dp),
-                modifier = Modifier.padding(5.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.White,
-                    contentColor = Color.Gray
-                )
-            ) {
-                Text(
-                    text = item,
-                    color = Color.Blue,
-                    fontSize = 30.sp,
-                )
-            }
-        }*/
     }
 }
 
