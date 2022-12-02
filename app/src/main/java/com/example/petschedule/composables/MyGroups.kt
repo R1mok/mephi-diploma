@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -32,6 +33,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.entities.Group
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
@@ -53,10 +55,13 @@ fun MyGroupsPreview() {
 
 
 @Composable
-fun MyGroups(navController: NavController, token : String) {
+fun MyGroups(navController: NavController, token: String) {
     if (false)
         navController.navigate(Screen.MyGroups.route)
     val context = LocalContext.current
+    val groups = remember {
+        getGroups(token, context)
+    }
     val state = remember {
         mutableStateOf(Group("", ""))
     }
@@ -89,11 +94,28 @@ fun MyGroups(navController: NavController, token : String) {
             .fillMaxSize()
             .padding(vertical = 100.dp)
     ) {
-        itemsIndexed(
+        items(groups) { group ->
+            Button(
+                onClick = { /*TODO*/ },
+                shape = RoundedCornerShape(15.dp),
+                modifier = Modifier.padding(5.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.White,
+                    contentColor = Color.Gray
+                )
+            ) {
+                Text(
+                    text = "${group.id}:${group.name}",
+                    color = Color.Blue,
+                    fontSize = 30.sp
+                )
+            }
+        }
+        /*itemsIndexed(
             listOf(state.value.id, state.value.name)
         ) { _, item ->
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { *//*TODO*//* },
                 shape = RoundedCornerShape(15.dp),
                 modifier = Modifier.padding(5.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -107,8 +129,40 @@ fun MyGroups(navController: NavController, token : String) {
                     fontSize = 30.sp,
                 )
             }
+        }*/
+    }
+}
+
+private fun getGroups(
+    token: String,
+    context: Context
+): MutableList<Group> {
+    val url = "http://localhost:8091/groups/"
+    val groups = mutableListOf<Group>()
+    val queue = Volley.newRequestQueue(context)
+    val stringRequest = object : StringRequest(
+        Method.GET,
+        url,
+        { response ->
+            val obj = JSONArray(response)
+            Log.d("MyLog", "obj length = ${obj.length()}")
+            for (i in 0 until obj.length()) {
+                Log.d("MyLog", "i = $i, value = ${obj.getString(i)}")
+                val jsonGroup = JSONObject(obj.getString(i))
+                groups.add(Group(jsonGroup.get("id").toString(), jsonGroup.get("name").toString()))
+            }
+        },
+        { error ->
+            Log.d("MyLog", "Error $error")
+        }) {
+        override fun getHeaders(): MutableMap<String, String> {
+            val headers = HashMap<String, String>()
+            headers["Authorization"] = token
+            return headers
         }
     }
+    queue.add(stringRequest)
+    return groups
 }
 
 private fun createGroup(
@@ -119,7 +173,6 @@ private fun createGroup(
 ) {
     val url = "http://localhost:8091/groups/create" +
             "?name=$name"
-    //val newUrl = "https://ya.ru"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.POST,
