@@ -181,7 +181,8 @@ fun authLogin(
             val obj = JSONObject(response)
             user.value.token = obj.getString("token")
             Log.d("MyLog", "Token: ${user.value.token}")
-            navController.navigate(Screen.MainScreen.route)
+            navController
+                .navigate(Screen.MainScreen.withArgs(user.value.token))
         },
         { error ->
             val resp = error.networkResponse
@@ -191,7 +192,8 @@ fun authLogin(
             else
                 statusCode = resp.statusCode
             Log.d("MyLog", "Error: $statusCode")
-            navController.navigate(Screen.WrongCredentials.withArgs(statusCode.toString()))
+            navController
+                .navigate(Screen.WrongCredentials.withArgs(statusCode.toString()))
         }) {
         override fun getBodyContentType(): String {
             return "application/json"

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.petschedule.R
+import com.example.petschedule.entities.User
 
 @Preview
 @Composable
@@ -30,12 +31,12 @@ fun MainScreenPreview() {
             painter = painterResource(id = R.drawable.background),
             contentScale = ContentScale.Crop
         )) {
-        MainScreen(navController = rememberNavController())
+        MainScreen(navController = rememberNavController(), "")
     }
 }
 
 @Composable
-fun MainScreen(navController: NavController) {
+fun MainScreen(navController: NavController, token : String) {
 
     Column(
         modifier = Modifier
@@ -57,10 +58,29 @@ fun MainScreen(navController: NavController) {
         }
         Button(
             modifier = Modifier
-                .offset(y = 600.dp)
+                .offset(y = 400.dp)
                 .fillMaxWidth(0.9f),
             onClick = {
-                navController.navigate(Screen.MyGroups.route)
+                navController.navigate(Screen.UserAccount.withArgs(token))
+            },
+            shape = RoundedCornerShape(15.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.Gray
+            ),
+
+            ) {
+            Text(
+                text = "Информация об аккаунте",
+                style = TextStyle(fontSize = 25.sp, color = Color.Blue)
+            )
+        }
+        Button(
+            modifier = Modifier
+                .offset(y = 500.dp)
+                .fillMaxWidth(0.9f),
+            onClick = {
+                navController.navigate(Screen.MyGroups.withArgs(token))
             },
             shape = RoundedCornerShape(15.dp),
             colors = ButtonDefaults.buttonColors(

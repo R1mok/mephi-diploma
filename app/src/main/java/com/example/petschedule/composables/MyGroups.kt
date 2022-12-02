@@ -26,8 +26,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.petschedule.R
 import com.example.petschedule.entities.Group
 import org.json.JSONObject
 import java.io.File
@@ -35,9 +38,24 @@ import java.io.File
 
 @Preview
 @Composable
-fun MyGroups() {
-    val token =
-        "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyMW1vayIsImlhdCI6MTY2ODUxNDA1NCwiZXhwIjoxNjY5MTE4ODU0fQ.3M3pVQ4ehW9SpZ2murk7K9p5Th9WLDB51zIrZnQPh00"
+fun MyGroupsPreview() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .paint(
+                painter = painterResource(id = R.drawable.background),
+                contentScale = ContentScale.Crop
+            )
+    ) {
+        MyGroups(navController = rememberNavController(), "")
+    }
+}
+
+
+@Composable
+fun MyGroups(navController: NavController, token : String) {
+    if (false)
+        navController.navigate(Screen.MyGroups.route)
     val context = LocalContext.current
     val state = remember {
         mutableStateOf(Group("", ""))

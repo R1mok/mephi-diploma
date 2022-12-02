@@ -15,4 +15,5 @@ sealed class Screen(val route : String) {
             }
         }
     }
+    object UserAccount : Screen("user_account")
 }

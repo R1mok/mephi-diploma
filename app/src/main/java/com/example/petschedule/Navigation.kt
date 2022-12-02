@@ -17,6 +17,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.example.petschedule.composables.*
+import com.example.petschedule.entities.User
 
 @Composable
 fun Navigation() {
@@ -26,19 +27,50 @@ fun Navigation() {
         navController = navController,
         startDestination = Screen.LoginPage.route
     ) {
-        composable(route = Screen.MainScreen.route) {
+        composable(
+            route = Screen.MainScreen.route + "/{token}",
+            arguments = listOf(
+                navArgument("token") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                }
+            ),
+        ) { entry ->
+            val token = entry.arguments?.getString("token").toString()
+            MainScreen(navController = navController, token)
             BackHandler(true) {
             }
-            MainScreen(navController = navController)
         }
         composable(route = Screen.LoginPage.route) {
             LoginPage(navController = navController)
         }
-        composable(route = Screen.MyGroups.route) {
-            MyGroups()
+        composable(route = Screen.MyGroups.route + "/{token}",
+                arguments = listOf(
+                navArgument("token") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                }
+                ),
+        ) { entry ->
+            val token = entry.arguments?.getString("token").toString()
+            MyGroups(navController = navController, token)
         }
         composable(route = Screen.RegPage.route) {
             RegPage(navController = navController)
+        }
+        composable(route = Screen.UserAccount.route + "/{token}",
+            arguments = listOf(
+                navArgument("token") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                }
+            )
+        ) { entry ->
+            val token = entry.arguments?.getString("token").toString()
+            UserAccount(navController = navController, token)
         }
         dialog(
             route = Screen.LoginBusy.route + "/{login}",
@@ -53,8 +85,8 @@ fun Navigation() {
                 dismissOnClickOutside = true,
                 dismissOnBackPress = true
             )
-        ) {
-            entry -> entry.arguments?.getString("login")
+        ) { entry ->
+            entry.arguments?.getString("login")
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -84,8 +116,8 @@ fun Navigation() {
                 dismissOnBackPress = true,
                 dismissOnClickOutside = true
             )
-        ) {
-            entry -> val status = entry.arguments?.getString("status")
+        ) { entry ->
+            val status = entry.arguments?.getString("status")
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -95,7 +127,7 @@ fun Navigation() {
                     .clip(RoundedCornerShape(10.dp))
                     .background(Color.White),
             ) {
-                val text : String
+                val text: String
                 if (status.equals("403")) {
                     text = "Неверные логин или пароль"
                 } else if (status.equals("503")) {
