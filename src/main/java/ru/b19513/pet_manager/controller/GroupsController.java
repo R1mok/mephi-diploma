@@ -8,8 +8,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.b19513.pet_manager.controller.entity.GroupDTO;
 import ru.b19513.pet_manager.controller.entity.StatusDTO;
+import ru.b19513.pet_manager.repository.entity.Group;
 import ru.b19513.pet_manager.repository.entity.User;
 import ru.b19513.pet_manager.service.GroupService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/groups")
@@ -42,6 +45,13 @@ public class GroupsController {
     public ResponseEntity<StatusDTO> invite(Authentication auth, @PathVariable long groupId, @PathVariable long userId) {
         StatusDTO statusDTO = groupService.inviteUser((User) auth.getPrincipal(), groupId, userId);
         return ResponseEntity.ok(statusDTO);
+    }
+    
+    @Operation(summary = "Получить все группы пользователя")
+    @GetMapping("/")
+    public ResponseEntity<List<GroupDTO>> getGroups(Authentication auth) {
+        List<GroupDTO> groups = groupService.getGroups(((User) auth.getPrincipal()).getId());
+        return ResponseEntity.ok(groups);
     }
 
     @Operation(summary = "Исключение из группы")

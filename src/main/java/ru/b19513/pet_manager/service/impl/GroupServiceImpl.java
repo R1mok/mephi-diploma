@@ -16,8 +16,11 @@ import ru.b19513.pet_manager.repository.entity.User;
 import ru.b19513.pet_manager.service.GroupService;
 import ru.b19513.pet_manager.service.mapper.GroupMapper;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ru.b19513.pet_manager.consts.Consts.*;
 
@@ -48,6 +51,16 @@ public class GroupServiceImpl implements GroupService {
         group.getUsers().add(owner);
         owner.setOwnedGroups(Set.of(group));
         return groupMapper.entityToDTO(groupRepository.save(group));
+    }
+
+    @Override
+    public List<GroupDTO> getGroups(long userId) {
+        var user = userRepository.findById(userId);
+        if (user.isEmpty())
+            throw new NotFoundException("User with user id " + userId + " not found");
+        var groups = new ArrayList<>(user.get().getGroups());
+        return groupMapper.entityToDTO(groups);
+
     }
 
     @Override
