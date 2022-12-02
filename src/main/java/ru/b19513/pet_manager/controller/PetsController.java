@@ -64,9 +64,8 @@ public class PetsController {
 
     @Operation(summary = "Создать запись о кормлении")
     @PostMapping("/createFeedNote")
-    public ResponseEntity<FeedNoteDTO> createFeedNote (Authentication auth, @RequestParam long petId,
+    public ResponseEntity<FeedNoteDTO> createFeedNote (@RequestParam long userId, @RequestParam long petId,
                                                        @RequestParam String comment){
-        var userId = ((User)auth.getDetails()).getId();
         FeedNoteDTO feedNoteDTO = petService.createFeedNote(petId, userId, comment);
         return ResponseEntity.ok(feedNoteDTO);
     }

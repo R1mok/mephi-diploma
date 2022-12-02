@@ -4,7 +4,11 @@ import ru.b19513.pet_manager.controller.entity.GroupDTO;
 import ru.b19513.pet_manager.controller.entity.StatusDTO;
 import ru.b19513.pet_manager.repository.entity.User;
 
+import java.util.List;
+
 public interface GroupService {
+
+    List<GroupDTO> getGroups(long userId);
 
     GroupDTO createGroup(User owner, String name);
 
