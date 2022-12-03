@@ -1,15 +1,23 @@
 package com.example.petschedule
 
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -45,20 +53,46 @@ fun Navigation() {
         composable(route = Screen.LoginPage.route) {
             LoginPage(navController = navController)
         }
-        composable(route = Screen.MyGroups.route + "/{token}",
-                arguments = listOf(
+        composable(
+            route = Screen.MyGroups.route + "/{token}",
+            arguments = listOf(
                 navArgument("token") {
                     type = NavType.StringType
                     defaultValue = ""
                     nullable = false
                 }
-                ),
+            ),
         ) { entry ->
             val token = entry.arguments?.getString("token").toString()
             MyGroups(navController = navController, token)
         }
         composable(route = Screen.RegPage.route) {
             RegPage(navController = navController)
+        }
+        composable(
+            route = Screen.GroupScreen.route + "/{token}" + "/{id}" + "/{name}",
+            arguments = listOf(
+                navArgument("token") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                },
+                navArgument("id") {
+                    type = NavType.StringType
+                    defaultValue = "0"
+                    nullable = false
+                },
+                navArgument("name") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                }
+            )
+        ) { entry ->
+            val token = entry.arguments?.getString("token").toString()
+            val id = entry.arguments?.getString("id").toString()
+            val name = entry.arguments?.getString("name").toString()
+            GroupScreen(navController = navController, token, id, name)
         }
         composable(route = Screen.UserAccount.route + "/{token}",
             arguments = listOf(
@@ -101,6 +135,62 @@ fun Navigation() {
                     text = text,
                     fontSize = 22.sp
                 )
+            }
+        }
+        dialog(
+            route = Screen.CreateGroup.route + "/{token}",
+            arguments = listOf(
+                navArgument("token") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                }
+            )
+        ) { entry ->
+            val token = entry.arguments?.getString("token")
+            var groupName by rememberSaveable { mutableStateOf("") }
+            val context = LocalContext.current
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 50.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Введите имя группы",
+                    style = TextStyle(fontSize = 25.sp, color = Color.Blue),
+                    modifier = Modifier
+                        .background(color = Color.White)
+                        .align(Alignment.CenterHorizontally)
+                )
+                OutlinedTextField(
+                    value = groupName,
+                    onValueChange = { groupName = it },
+                    label = { Text("Имя группы") },
+                    placeholder = { Text("Имя группы") },
+                    textStyle = TextStyle(fontSize = 25.sp),
+                )
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(vertical = 50.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color.Gray
+                    ),
+                    onClick = {
+                        createGroup(token.toString(), groupName, context)
+                        navController.navigate(Screen.MyGroups.withArgs(token.toString()))
+                    }
+                ) {
+                    Text(
+                        text = "Создать группу",
+                        style = TextStyle(fontSize = 25.sp, color = Color.Blue),
+                        modifier = Modifier
+                            .background(color = Color.White)
+                    )
+                }
             }
         }
         dialog(

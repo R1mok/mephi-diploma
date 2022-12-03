@@ -3,6 +3,7 @@ package com.example.petschedule.composables
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -62,16 +63,15 @@ fun MyGroups(navController: NavController, token: String) {
     val groups = remember {
         getGroups(token, context)
     }
-    val state = remember {
-        mutableStateOf(Group("", ""))
-    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(0.1f)
     ) {
         Button(
-            onClick = { createGroup(token, "groupName", state, context) },
+            onClick = {
+                navController.navigate(Screen.CreateGroup.withArgs(token))
+            },
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier
                 .padding(5.dp)
@@ -96,7 +96,9 @@ fun MyGroups(navController: NavController, token: String) {
     ) {
         items(groups) { group ->
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    navController.navigate(Screen.GroupScreen.withArgs(token, group.id, group.name))
+                },
                 shape = RoundedCornerShape(15.dp),
                 modifier = Modifier.padding(5.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -146,10 +148,9 @@ private fun getGroups(
     return groups
 }
 
-private fun createGroup(
+fun createGroup(
     token: String,
     name: String,
-    groupState: MutableState<Group>,
     context: Context
 ) {
     val url = "http://localhost:8091/groups/create" +
@@ -158,10 +159,7 @@ private fun createGroup(
     val stringRequest = object : StringRequest(
         Method.POST,
         url,
-        { response ->
-            var obj = JSONObject(response)
-            groupState.value = Group(obj.get("id").toString(), obj.get("name").toString())
-        },
+        {},
         { error ->
             Log.d("MyLog", "Error $error")
         }) {
