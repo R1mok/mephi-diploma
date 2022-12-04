@@ -35,9 +35,8 @@ public class PetsController {
     @Operation(summary = "Добавить нового питомца")
     @PostMapping("/createPet")
     public ResponseEntity<PetDTO> createPet(@RequestParam long groupId, @RequestParam String name,
-                                            @RequestParam String description,
                                             @RequestParam Gender gender, @RequestParam PetType petType) {
-        PetDTO petDTO = petService.createPet(groupId, name, description, gender, petType);
+        PetDTO petDTO = petService.createPet(groupId, name, "", gender, petType);
         return ResponseEntity.ok(petDTO);
     }
 
