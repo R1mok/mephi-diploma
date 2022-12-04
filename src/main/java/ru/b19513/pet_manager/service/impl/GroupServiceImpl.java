@@ -59,7 +59,7 @@ public class GroupServiceImpl implements GroupService {
         if (user.isEmpty())
             throw new NotFoundException("User with user id " + userId + " not found");
         var groups = new ArrayList<>(user.get().getGroups());
-        return groupMapper.entityToDTO(groups);
+        return groupMapper.entityToDTO(groups.stream().sorted((a, b) -> (int) (a.getId() - b.getId())).collect(Collectors.toList()));
 
     }
 

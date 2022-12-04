@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static ru.b19513.pet_manager.consts.Consts.PET_DELETED;
 
@@ -85,7 +86,7 @@ public class PetServiceImpl implements PetService {
     @Override
     public Collection<PetDTO> getPets(long groupId) {
         var group = groupRepository.findById(groupId).orElseThrow(new NotFoundException("Group wih group id " + groupId + " not found"));
-        return petMapper.entityToDTO(group.getPets());
+        return petMapper.entityToDTO(group.getPets().stream().sorted((a, b) -> (int) (a.getId() - b.getId())).collect(Collectors.toList()));
     }
 
     @Override
