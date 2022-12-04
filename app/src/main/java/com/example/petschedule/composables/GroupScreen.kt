@@ -90,21 +90,41 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                 .background(color = Color.White)
                 .align(Alignment.CenterHorizontally)
         )
-        Text(
-            text = "Добавить нового питомца",
-            style = TextStyle(fontSize = 25.sp, color = Color.Blue),
+        Button(
             modifier = Modifier
+                .fillMaxWidth(0.9f)
                 .align(Alignment.CenterHorizontally)
-                .background(color = Color.White)
-                .clickable { isExpandedCreatePet = !isExpandedCreatePet }
-        )
-        Spacer(modifier = Modifier.padding(vertical = 20.dp))
+                .padding(vertical = 10.dp),
+            onClick = {
+                      isExpandedCreatePet = !isExpandedCreatePet
+            },
+            shape = RoundedCornerShape(15.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.Gray
+            ),
+
+            ) {
+            Text(
+                text = "Добавить нового питомца",
+                style = TextStyle(fontSize = 20.sp, color = Color.Blue)
+            )
+        }
+        Spacer(modifier = Modifier.padding(vertical = 10.dp))
         if (isExpandedCreatePet) {
             OutlinedTextField(
                 value = petName,
                 onValueChange = { petName = it },
                 label = { Text(text = "Имя питомца") },
                 textStyle = TextStyle(fontSize = 25.sp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedLabelColor = Color.Blue,
+                    unfocusedLabelColor = Color.Blue,
+                    cursorColor = Color.Black,
+                    focusedBorderColor = Color.Blue,
+                    backgroundColor = Color.White,
+                    unfocusedBorderColor = Color.Blue,
+                    textColor = Color.Blue)
             )
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -264,7 +284,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 100.dp)
+                .padding(vertical = 40.dp)
         ) {
             items(pets.value) { pet ->
                 Button(
