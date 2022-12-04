@@ -1,5 +1,6 @@
 package com.example.petschedule.composables
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.Log
@@ -34,6 +35,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.entities.Group
+import com.example.petschedule.entities.Pet
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -55,14 +57,16 @@ fun MyGroupsPreview() {
 }
 
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun MyGroups(navController: NavController, token: String) {
     if (false)
         navController.navigate(Screen.MyGroups.route)
     val context = LocalContext.current
-    val groups = remember {
-        getGroups(token, context)
+    var groups = remember {
+        mutableStateOf(mutableListOf<Group>())
     }
+    getGroups(token, context, groups)
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -94,7 +98,7 @@ fun MyGroups(navController: NavController, token: String) {
             .fillMaxSize()
             .padding(vertical = 100.dp)
     ) {
-        items(groups) { group ->
+        items(groups.value) { group ->
             Button(
                 onClick = {
                     navController.navigate(Screen.GroupScreen.withArgs(token, group.id, group.name))
@@ -118,10 +122,11 @@ fun MyGroups(navController: NavController, token: String) {
 
 private fun getGroups(
     token: String,
-    context: Context
-): MutableList<Group> {
+    context: Context,
+    groups : MutableState<MutableList<Group>>
+)  {
     val url = "http://localhost:8091/groups/"
-    val groups = mutableListOf<Group>()
+    val newGroup = mutableListOf<Group>()
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.GET,
@@ -132,8 +137,9 @@ private fun getGroups(
             for (i in 0 until obj.length()) {
                 Log.d("MyLog", "i = $i, value = ${obj.getString(i)}")
                 val jsonGroup = JSONObject(obj.getString(i))
-                groups.add(Group(jsonGroup.get("id").toString(), jsonGroup.get("name").toString()))
+                newGroup.add(Group(jsonGroup.get("id").toString(), jsonGroup.get("name").toString()))
             }
+            groups.value = newGroup
         },
         { error ->
             Log.d("MyLog", "Error $error")
@@ -145,7 +151,6 @@ private fun getGroups(
         }
     }
     queue.add(stringRequest)
-    return groups
 }
 
 fun createGroup(
