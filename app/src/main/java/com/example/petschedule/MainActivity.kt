@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxSize()
                         .paint(
-                        painter = painterResource(id = R.drawable.background),
+                        painter = painterResource(id = R.drawable.background1),
                         contentScale = ContentScale.Crop
                     )
                 ) {

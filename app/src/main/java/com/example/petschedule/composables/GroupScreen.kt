@@ -3,6 +3,7 @@ package com.example.petschedule.composables
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -39,8 +40,9 @@ fun GroupScreenPreview() {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(color = Color.Yellow)
             .paint(
-                painter = painterResource(id = R.drawable.background),
+                painter = painterResource(id = R.drawable.background1),
                 contentScale = ContentScale.Crop
             )
     ) {
@@ -51,9 +53,6 @@ fun GroupScreenPreview() {
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun GroupScreen(navController: NavController, token: String, id: String, name: String) {
-    if (false) {
-        navController.navigate(Screen.GroupScreen.withArgs(token, id, name))
-    }
     val context = LocalContext.current
     var petName by rememberSaveable { mutableStateOf("") }
     var petType by rememberSaveable {
@@ -87,30 +86,27 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
             text = name,
             style = TextStyle(fontSize = 25.sp, color = Color.Blue),
             modifier = Modifier
-                .background(color = Color.White)
+                .background(color = Color.Transparent)
                 .align(Alignment.CenterHorizontally)
         )
         Button(
             modifier = Modifier
-                .fillMaxWidth(0.9f)
+                .fillMaxWidth(0.8f)
                 .align(Alignment.CenterHorizontally)
-                .padding(vertical = 10.dp),
+                .padding(vertical = 20.dp),
             onClick = {
-                      isExpandedCreatePet = !isExpandedCreatePet
+                isExpandedCreatePet = !isExpandedCreatePet
             },
             shape = RoundedCornerShape(15.dp),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.White,
-                contentColor = Color.Gray
-            ),
-
-            ) {
+                contentColor = Color.White
+            )) {
             Text(
                 text = "Добавить нового питомца",
                 style = TextStyle(fontSize = 20.sp, color = Color.Blue)
             )
         }
-        Spacer(modifier = Modifier.padding(vertical = 10.dp))
         if (isExpandedCreatePet) {
             OutlinedTextField(
                 value = petName,
@@ -124,7 +120,8 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                     focusedBorderColor = Color.Blue,
                     backgroundColor = Color.White,
                     unfocusedBorderColor = Color.Blue,
-                    textColor = Color.Blue)
+                    textColor = Color.Blue
+                )
             )
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -269,7 +266,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                 Text(
                     text = "Добавить",
                     color = Color.Blue,
-                    fontSize = 25.sp,
+                    fontSize = 20.sp,
                 )
             }
         }
@@ -278,8 +275,16 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
             style = TextStyle(fontSize = 25.sp, color = Color.Blue),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .background(color = Color.White)
         )
+        if (pets.value.size == 0) {
+            Text(
+                text = "Питомцев пока нет :)",
+                style = TextStyle(fontSize = 18.sp, color = Color.Blue),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = 5.dp)
+            )
+        }
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -289,7 +294,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
             items(pets.value) { pet ->
                 Button(
                     onClick = {
-                        //navController.navigate(Screen.GroupScreen.withArgs(token, group.id, group.name))
+                        navController.navigate(Screen.PetScreen.withArgs(token, pet.id, pet.name))
                     },
                     shape = RoundedCornerShape(15.dp),
                     modifier = Modifier.padding(5.dp),
@@ -311,7 +316,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
 
 
 fun createPet(
-    pets : MutableState<MutableList<Pet>>,
+    pets: MutableState<MutableList<Pet>>,
     context: Context,
     token: String,
     id: String,

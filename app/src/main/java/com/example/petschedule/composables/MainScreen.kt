@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -28,7 +29,7 @@ fun MainScreenPreview() {
     Box(modifier = Modifier
         .fillMaxSize()
         .paint(
-            painter = painterResource(id = R.drawable.background),
+            painter = painterResource(id = R.drawable.background1),
             contentScale = ContentScale.Crop
         )) {
         MainScreen(navController = rememberNavController(), "")
@@ -40,25 +41,19 @@ fun MainScreen(navController: NavController, token : String) {
 
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .padding(vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Card(
+        Text(
+            text = "Управелние питомцами",
+            style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
             modifier = Modifier
-                .offset(y = 100.dp),
-            shape = RoundedCornerShape(15.dp)
-        ) {
-            Text(
-                text = "Управелние питомцами",
-                style = TextStyle(fontSize = 25.sp, color = Color.Blue),
-                modifier = Modifier
-                    .background(color = Color.White)
-                    .padding(5.dp)
-            )
-        }
+                .padding(vertical = 50.dp)
+        )
         Button(
             modifier = Modifier
-                .offset(y = 400.dp)
+                .offset(y = 300.dp)
                 .fillMaxWidth(0.9f),
             onClick = {
                 navController.navigate(Screen.UserAccount.withArgs(token))

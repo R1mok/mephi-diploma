@@ -2,6 +2,8 @@ package com.example.petschedule.composables
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,6 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -43,7 +46,7 @@ fun LoginPagePreview() {
         modifier = Modifier
             .fillMaxSize()
             .paint(
-                painter = painterResource(id = R.drawable.background),
+                painter = painterResource(id = R.drawable.background1),
                 contentScale = ContentScale.Crop
             )
     ) {
@@ -71,9 +74,9 @@ fun LoginPage(navController: NavController) {
     ) {
         Text(
             text = "Вход в аккаунт",
-            style = TextStyle(fontSize = 25.sp, color = Color.Blue),
+            style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
             modifier = Modifier
-                .background(color = Color.White)
+                .background(color = Color.Transparent)
                 .align(Alignment.CenterHorizontally)
         )
         Row(
@@ -128,9 +131,10 @@ fun LoginPage(navController: NavController) {
         }
         Text(
             text = "Регистрация",
-            style = TextStyle(fontSize = 20.sp, color = Color.Blue),
+            style = TextStyle(fontSize = 20.sp, color = Color.DarkGray),
             modifier = Modifier
-                .background(color = Color.White)
+                .background(color = Color.Transparent)
+                .padding(vertical = 5.dp)
                 .clickable {
                     navController.navigate(route = Screen.RegPage.route)
                 }
@@ -138,13 +142,13 @@ fun LoginPage(navController: NavController) {
         )
         Button(
             modifier = Modifier
-                .fillMaxWidth(0.8f)
+                .fillMaxWidth(0.4f)
                 .align(Alignment.CenterHorizontally)
                 .padding(vertical = 50.dp),
             shape = RoundedCornerShape(15.dp),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.White,
-                contentColor = Color.Gray
+                contentColor = Color.Unspecified
             ),
             onClick = {
                 Log.d(
@@ -158,9 +162,17 @@ fun LoginPage(navController: NavController) {
         ) {
             Text(
                 text = "Войти",
-                style = TextStyle(fontSize = 25.sp, color = Color.Blue),
+                style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
                 modifier = Modifier
-                    .background(color = Color.White)
+                    .clickable {
+                        Log.d(
+                            "MyLog", "Login: ${login}," +
+                                    " password: ${password}"
+                        )
+                        user.value.login = login
+                        user.value.password = password
+                        authLogin(user, context, navController)
+                    }
             )
         }
     }

@@ -49,7 +49,7 @@ fun MyGroupsPreview() {
         modifier = Modifier
             .fillMaxSize()
             .paint(
-                painter = painterResource(id = R.drawable.background),
+                painter = painterResource(id = R.drawable.background1),
                 contentScale = ContentScale.Crop
             )
     ) {
@@ -101,9 +101,7 @@ fun MyGroups(navController: NavController, token: String) {
         val focusManager = LocalFocusManager.current
         if (isCreateGroup) {
             Column(
-                modifier = Modifier
-                    .padding(vertical = 20.dp)
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
                     value = groupName,
@@ -129,30 +127,9 @@ fun MyGroups(navController: NavController, token: String) {
                         }
                     ),
                     modifier = Modifier.padding(vertical = 30.dp)
-
+                        .fillMaxWidth(0.8f)
+                        .align(Alignment.CenterHorizontally)
                 )
-                /*Button(
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 50.dp),
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.White,
-                    contentColor = Color.Gray
-                ),
-                onClick = {
-                    createGroup(token, groupName, context, groups)
-                    isCreateGroup = false
-                }
-            ) {
-                Text(
-                    text = "Создать группу",
-                    style = TextStyle(fontSize = 25.sp, color = Color.Blue),
-                    modifier = Modifier
-                        .background(color = Color.White)
-                )
-            }*/
             }
         }
         LazyColumn(

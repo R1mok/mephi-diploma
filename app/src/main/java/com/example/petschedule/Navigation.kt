@@ -137,6 +137,32 @@ fun Navigation() {
                 )
             }
         }
+        composable(
+            route = Screen.PetScreen.route + "/{token}" + "/{pet_id}" + "/{pet_name}",
+            arguments = listOf(
+                navArgument("token") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                },
+                navArgument("pet_id") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                },
+                navArgument("pet_name") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                }
+            ),
+        )
+        { entry ->
+            val token = entry.arguments?.getString("token").toString()
+            val petId = entry.arguments?.getString("pet_id").toString()
+            val petName = entry.arguments?.getString("pet_name").toString()
+            PetScreen(navController = navController, token, petId, petName)
+        }
         dialog(
             route = Screen.WrongCredentials.route + "/{status}",
             arguments = listOf(
