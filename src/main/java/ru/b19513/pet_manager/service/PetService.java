@@ -17,6 +17,8 @@ public interface PetService {
 
     Collection<PetDTO> getPets(long groupId);
 
+    PetDTO getPet(long petId);
+
     StatusDTO deletePet(long petId);
 
     FeedNoteDTO createFeedNote(long petId, long userId, String comment);

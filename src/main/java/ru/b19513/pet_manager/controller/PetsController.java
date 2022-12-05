@@ -54,6 +54,13 @@ public class PetsController {
         return ResponseEntity.ok(PetDTOCollection);
     }
 
+    @Operation(summary = "Получить питомца по id")
+    @GetMapping("/{petId}")
+    public ResponseEntity<PetDTO> getPet(@PathVariable long petId) {
+        return ResponseEntity.ok(petService.getPet(petId));
+    }
+
+
     @Operation(summary = "Удалить питомца и все связанные с ним напоминания и записи")
     @DeleteMapping("/{petId}")
     public ResponseEntity<StatusDTO> deletePet(@PathVariable long petId) {

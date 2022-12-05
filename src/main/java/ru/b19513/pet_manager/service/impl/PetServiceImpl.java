@@ -74,6 +74,15 @@ public class PetServiceImpl implements PetService {
         return petMapper.entityToDTO(petRepository.save(pet));
     }
 
+
+    @Override
+    public PetDTO getPet(long petId) {
+        var pet = petRepository
+                .findById(petId)
+                .orElseThrow(new NotFoundException("Pet with pet id " + petId + " not found"));
+        return petMapper.entityToDTO(pet);
+    }
+
     @Override
     public PetDTO updatePet(PetDTO petDTO) {
         var pet = petRepository
