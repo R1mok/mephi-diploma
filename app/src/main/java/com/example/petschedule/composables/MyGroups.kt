@@ -2,30 +2,33 @@ package com.example.petschedule.composables
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.util.Log
-import androidx.activity.compose.BackHandler
-import androidx.annotation.DrawableRes
+import android.view.KeyEvent.KEYCODE_ENTER
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,10 +38,8 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.entities.Group
-import com.example.petschedule.entities.Pet
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.File
 
 
 @Preview
@@ -57,24 +58,30 @@ fun MyGroupsPreview() {
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun MyGroups(navController: NavController, token: String) {
     if (false)
         navController.navigate(Screen.MyGroups.route)
     val context = LocalContext.current
+    var isCreateGroup by remember {
+        mutableStateOf(false)
+    }
     var groups = remember {
         mutableStateOf(mutableListOf<Group>())
     }
+    var groupName by rememberSaveable { mutableStateOf("") }
     getGroups(token, context, groups)
-    Box(
+    Column(
         modifier = Modifier
+            .padding(vertical = 50.dp)
+            .padding(horizontal = 10.dp)
             .fillMaxWidth()
-            .fillMaxHeight(0.1f)
     ) {
         Button(
             onClick = {
-                navController.navigate(Screen.CreateGroup.withArgs(token))
+                isCreateGroup = !isCreateGroup
             },
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier
@@ -91,30 +98,93 @@ fun MyGroups(navController: NavController, token: String) {
                 fontSize = 30.sp,
             )
         }
-    }
-    LazyColumn(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = 100.dp)
-    ) {
-        items(groups.value) { group ->
-            Button(
-                onClick = {
-                    navController.navigate(Screen.GroupScreen.withArgs(token, group.id, group.name))
-                },
+        val focusManager = LocalFocusManager.current
+        if (isCreateGroup) {
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 20.dp)
+                    .fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = groupName,
+                    onValueChange = { groupName = it },
+                    label = { Text("Имя группы") },
+                    textStyle = TextStyle(fontSize = 25.sp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedLabelColor = Color.Blue,
+                        unfocusedLabelColor = Color.Blue,
+                        cursorColor = Color.Black,
+                        focusedBorderColor = Color.Blue,
+                        backgroundColor = Color.White,
+                        unfocusedBorderColor = Color.Blue,
+                        textColor = Color.Blue
+                    ),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            createGroup(token, groupName, context, groups)
+                            isCreateGroup = false
+                            focusManager.clearFocus()
+                        }
+                    ),
+                    modifier = Modifier.padding(vertical = 30.dp)
+
+                )
+                /*Button(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = 50.dp),
                 shape = RoundedCornerShape(15.dp),
-                modifier = Modifier.padding(5.dp),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.White,
                     contentColor = Color.Gray
-                )
+                ),
+                onClick = {
+                    createGroup(token, groupName, context, groups)
+                    isCreateGroup = false
+                }
             ) {
                 Text(
-                    text = "${group.id}:${group.name}",
-                    color = Color.Blue,
-                    fontSize = 30.sp
+                    text = "Создать группу",
+                    style = TextStyle(fontSize = 25.sp, color = Color.Blue),
+                    modifier = Modifier
+                        .background(color = Color.White)
                 )
+            }*/
+            }
+        }
+        LazyColumn(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 20.dp)
+        ) {
+            items(groups.value) { group ->
+                Button(
+                    onClick = {
+                        navController.navigate(
+                            Screen.GroupScreen.withArgs(
+                                token,
+                                group.id,
+                                group.name
+                            )
+                        )
+                    },
+                    shape = RoundedCornerShape(15.dp),
+                    modifier = Modifier.padding(5.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color.Gray
+                    )
+                ) {
+                    Text(
+                        text = "${group.id}:${group.name}",
+                        color = Color.Blue,
+                        fontSize = 30.sp
+                    )
+                }
             }
         }
     }
@@ -123,8 +193,8 @@ fun MyGroups(navController: NavController, token: String) {
 private fun getGroups(
     token: String,
     context: Context,
-    groups : MutableState<MutableList<Group>>
-)  {
+    groups: MutableState<MutableList<Group>>
+) {
     val url = "http://localhost:8091/groups/"
     val newGroup = mutableListOf<Group>()
     val queue = Volley.newRequestQueue(context)
@@ -137,7 +207,12 @@ private fun getGroups(
             for (i in 0 until obj.length()) {
                 Log.d("MyLog", "i = $i, value = ${obj.getString(i)}")
                 val jsonGroup = JSONObject(obj.getString(i))
-                newGroup.add(Group(jsonGroup.get("id").toString(), jsonGroup.get("name").toString()))
+                newGroup.add(
+                    Group(
+                        jsonGroup.get("id").toString(),
+                        jsonGroup.get("name").toString()
+                    )
+                )
             }
             groups.value = newGroup
         },
@@ -156,7 +231,8 @@ private fun getGroups(
 fun createGroup(
     token: String,
     name: String,
-    context: Context
+    context: Context,
+    groups: MutableState<MutableList<Group>>
 ) {
     val url = "http://localhost:8091/groups/create" +
             "?name=$name"
@@ -164,7 +240,9 @@ fun createGroup(
     val stringRequest = object : StringRequest(
         Method.POST,
         url,
-        {},
+        {
+            getGroups(token, context, groups)
+        },
         { error ->
             Log.d("MyLog", "Error $error")
         }) {

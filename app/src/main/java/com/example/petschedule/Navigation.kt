@@ -138,62 +138,6 @@ fun Navigation() {
             }
         }
         dialog(
-            route = Screen.CreateGroup.route + "/{token}",
-            arguments = listOf(
-                navArgument("token") {
-                    type = NavType.StringType
-                    defaultValue = ""
-                    nullable = false
-                }
-            )
-        ) { entry ->
-            val token = entry.arguments?.getString("token")
-            var groupName by rememberSaveable { mutableStateOf("") }
-            val context = LocalContext.current
-            Column(
-                modifier = Modifier
-                    .padding(vertical = 50.dp)
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text = "Введите имя группы",
-                    style = TextStyle(fontSize = 25.sp, color = Color.Blue),
-                    modifier = Modifier
-                        .background(color = Color.White)
-                        .align(Alignment.CenterHorizontally)
-                )
-                OutlinedTextField(
-                    value = groupName,
-                    onValueChange = { groupName = it },
-                    label = { Text("Имя группы") },
-                    placeholder = { Text("Имя группы") },
-                    textStyle = TextStyle(fontSize = 25.sp),
-                )
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .align(Alignment.CenterHorizontally)
-                        .padding(vertical = 50.dp),
-                    shape = RoundedCornerShape(15.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.White,
-                        contentColor = Color.Gray
-                    ),
-                    onClick = {
-                        createGroup(token.toString(), groupName, context)
-                        navController.navigate(Screen.MyGroups.withArgs(token.toString()))
-                    }
-                ) {
-                    Text(
-                        text = "Создать группу",
-                        style = TextStyle(fontSize = 25.sp, color = Color.Blue),
-                        modifier = Modifier
-                            .background(color = Color.White)
-                    )
-                }
-            }
-        }
-        dialog(
             route = Screen.WrongCredentials.route + "/{status}",
             arguments = listOf(
                 navArgument("status") {
