@@ -5,6 +5,7 @@ import ru.b19513.pet_manager.repository.entity.enums.Gender;
 import ru.b19513.pet_manager.repository.entity.enums.PetType;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -41,6 +42,9 @@ public class Pet {
     @OneToMany
     @Column
     private Set<Notification> notifications;
+
+    @Column
+    private Date bornDate;
 
     @OneToMany(cascade=CascadeType.ALL)
     @Column

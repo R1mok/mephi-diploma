@@ -7,6 +7,7 @@ import ru.b19513.pet_manager.controller.entity.enums.Gender;
 import ru.b19513.pet_manager.controller.entity.enums.PetType;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -23,6 +24,8 @@ public class PetDTO implements Serializable {
     private PetType type;
     @Schema(description = "Пол питомца")
     private Gender gender;
+    @Schema(description = "Дата рождения питомца")
+    private Date bornDate;
     @Schema(description = "Список замеров роста и веса питомца")
     private List<PetParametersDTO> petParametersDTO;
 }
