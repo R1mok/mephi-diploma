@@ -1,8 +1,10 @@
 package com.example.petschedule.composables
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.content.Context
 import android.util.Log
+import android.widget.DatePicker
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,6 +35,8 @@ import com.example.petschedule.entities.Group
 import com.example.petschedule.entities.Pet
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.*
+import kotlin.collections.HashMap
 
 @Preview
 @Composable
@@ -76,6 +80,29 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
         mutableStateOf(false)
     }
 
+    val mYear: Int
+    val mMonth: Int
+    val mDay: Int
+
+    val mCalendar = Calendar.getInstance()
+
+    mYear = mCalendar.get(Calendar.YEAR)
+    mMonth = mCalendar.get(Calendar.MONTH)
+    mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+
+    mCalendar.time = Date()
+
+    // Declaring a string value to
+    // store date in string format
+    val mDate = remember { mutableStateOf("") }
+
+    val mDatePickerDialog = DatePickerDialog(
+        context,
+        { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+            mDate.value = "$dayOfMonth/${month+1}/$year"
+        }, mYear, mMonth, mDay
+    )
+
     Column(
         modifier = Modifier
             .padding(vertical = 50.dp)
@@ -101,13 +128,14 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.White,
                 contentColor = Color.White
-            )) {
+            )
+        ) {
             Text(
                 text = "Добавить нового питомца",
                 style = TextStyle(fontSize = 20.sp, color = Color.Blue)
             )
         }
-        if (isExpandedCreatePet) {
+        if (!isExpandedCreatePet) {
             OutlinedTextField(
                 value = petName,
                 onValueChange = { petName = it },
@@ -247,6 +275,22 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                     }
                 }
             }
+            Button(
+                shape = RoundedCornerShape(15.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.White,
+                    contentColor = Color.Gray
+                ),
+                onClick = {
+                    mDatePickerDialog.show()
+                }
+            ) {
+                Text(
+                    text = "Введите дату рождения питомца",
+                    style = TextStyle(color = Color.Blue, fontSize = 20.sp)
+                )
+            }
+            // TODO ввести возраст питомца
 
             Button(
                 onClick = {
@@ -265,8 +309,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
             ) {
                 Text(
                     text = "Добавить",
-                    color = Color.Blue,
-                    fontSize = 20.sp,
+                    style = TextStyle(color = Color.Blue, fontSize = 20.sp)
                 )
             }
         }
