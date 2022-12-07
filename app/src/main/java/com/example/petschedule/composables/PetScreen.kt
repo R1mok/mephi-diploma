@@ -12,7 +12,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -30,7 +29,6 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.entities.FeedNote
-import com.example.petschedule.entities.Group
 import org.json.JSONObject
 
 
@@ -61,11 +59,11 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
     var petType = remember { mutableStateOf("") }
     var petGender = remember { mutableStateOf("") }
     var petDescription = remember { mutableStateOf("") }
-    var petAge = remember { mutableStateOf("") }
+    var petBornDate = remember { mutableStateOf("") }
     var notes = remember {
         mutableStateOf(mutableListOf<FeedNote>())
     }
-    getPetById(token, petId, petType, petGender, petDescription, petAge, context)
+    getPetById(token, petId, petType, petGender, petDescription, petBornDate, context)
 
     Column(
         modifier = Modifier
@@ -91,14 +89,13 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
             text = "Пол питомца: ${petGender.value}",
             style = TextStyle(fontSize = 20.sp, color = Color.Blue)
         )
+        Spacer(modifier = Modifier.padding(vertical = 10.dp))
         Text(
-            text = "Возраст питомца: ${petAge.value}",
+            text = "Дата рождения питомца: ${petBornDate.value}",
             style = TextStyle(fontSize = 20.sp, color = Color.Blue)
         )
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
         Button(
-            modifier = Modifier
-                .padding(vertical = 20.dp),
             onClick = {
                 // TODO переход на страницу статистики здоровья питомца (рост/вес)
             },
@@ -112,10 +109,10 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
                 style = TextStyle(fontSize = 20.sp, color = Color.Blue)
             )
         }
+        Spacer(modifier = Modifier.padding(vertical = 10.dp))
         Text(
             text = "Список ближайших уведомлений",
             style = TextStyle(fontSize = 20.sp, color = Color.Blue),
-            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -136,7 +133,7 @@ fun getPetById(
     petType: MutableState<String>,
     petGender: MutableState<String>,
     petDescription: MutableState<String>,
-    petAge : MutableState<String>,
+    petBornDate : MutableState<String>,
     context: Context) {
     val url = "http://localhost:8091/pets/${petId}"
     val queue = Volley.newRequestQueue(context)
@@ -148,7 +145,7 @@ fun getPetById(
             petType.value = obj.getString("type").toString()
             petGender.value = obj.getString("gender").toString()
             petDescription.value = obj.getString("description").toString()
-            petAge.value = obj.getString("age").toString()
+            petBornDate.value = obj.getString("age").toString()
         },
         { error ->
             Log.d("MyLog", "Error $error")

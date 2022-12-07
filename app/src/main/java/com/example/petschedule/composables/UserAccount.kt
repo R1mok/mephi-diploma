@@ -20,7 +20,7 @@ fun UserAccountPreview() {
         modifier = Modifier
             .fillMaxSize()
             .paint(
-                painter = painterResource(id = R.drawable.background),
+                painter = painterResource(id = R.drawable.background1),
                 contentScale = ContentScale.Crop
             )
     ) {
@@ -33,4 +33,5 @@ fun UserAccountPreview() {
 fun UserAccount(navController: NavController, token : String) {
     if (false)
         navController.navigate(Screen.UserAccount.withArgs(token))
+
 }
