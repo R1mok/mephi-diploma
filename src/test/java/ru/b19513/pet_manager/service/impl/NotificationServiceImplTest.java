@@ -19,7 +19,9 @@ import ru.b19513.pet_manager.service.mapper.NotificationMapper;
 
 import javax.transaction.Transactional;
 
+import java.time.Instant;
 import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +53,7 @@ class NotificationServiceImplTest {
     void createNotificationTimeout() {
         var userOwnerDTO = userService.signInNewUser("R1mok", "pass", "Anton");
         var groupDTO = groupService.createGroup(userRepository.getById(userOwnerDTO.getId()), "group");
-        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT);
+        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var notifTimeoutDTO = notificationService.createNotificationTimeout(groupDTO.getId(),
                 petDTO.getId(), "Barsik should to feed", 5);
         var notifInRepo = notificationMapper.entityToDTO((NotificationTimeout) notificationRepository.findAll().get(0));
@@ -70,7 +72,7 @@ class NotificationServiceImplTest {
     void createNotificationSchedule() {
         var userOwnerDTO = userService.signInNewUser("R1mok", "pass", "Anton");
         var groupDTO = groupService.createGroup(userRepository.getById(userOwnerDTO.getId()), "group");
-        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT);
+        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var notifScheduleDTO = notificationService.createNotificationSchedule(groupDTO.getId(),
                 petDTO.getId(), "Barsik should to feed", List.of(LocalTime.of(12, 30)));
         var notifInRepo = notificationMapper.entityToDTO((NotificationSchedule) notificationRepository.findAll().get(0));
@@ -89,7 +91,7 @@ class NotificationServiceImplTest {
     void updateNotificationSchedule() {
         var userOwnerDTO = userService.signInNewUser("R1mok", "pass", "Anton");
         var groupDTO = groupService.createGroup(userRepository.getById(userOwnerDTO.getId()), "group");
-        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT);
+        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var notifScheduleDTO = notificationService.createNotificationSchedule(groupDTO.getId(),
                 petDTO.getId(), "Barsik should to feeed", List.of(LocalTime.of(12, 30)));
         var notificationDTO = NotificationScheduleDTO.builder()
@@ -112,7 +114,7 @@ class NotificationServiceImplTest {
     void updateNotificationTimeout() {
         var userOwnerDTO = userService.signInNewUser("R1mok", "pass", "Anton");
         var groupDTO = groupService.createGroup(userRepository.getById(userOwnerDTO.getId()), "group");
-        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT);
+        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var notifTimeoutDTO = notificationService.createNotificationTimeout(groupDTO.getId(),
                 petDTO.getId(), "Barsik should to feeed", 1);
         var notificationDTO = NotificationTimeoutDTO.builder()
@@ -136,7 +138,7 @@ class NotificationServiceImplTest {
         var userDTO = userService.signInNewUser("R1mok", "pass", "Anton");
         var groupDTO = groupService.createGroup(userRepository.getById(userDTO.getId()), "group");
         var group = groupRepository.findAll().get(0);
-        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT);
+        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var fnDTO = petService.createFeedNote(petDTO.getId(), userDTO.getId(), "Feed Barsik");
         notificationService.createNotificationTimeout(groupDTO.getId(), petDTO.getId(), "Feed Barsik", 1);
         Thread.sleep(1000);
@@ -158,7 +160,7 @@ class NotificationServiceImplTest {
         var userDTO = userService.signInNewUser("R1mok", "pass", "Anton");
         var groupDTO = groupService.createGroup(userRepository.getById(userDTO.getId()), "group");
         var group = groupRepository.findAll().get(0);
-        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT);
+        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var fnDTO = petService.createFeedNote(petDTO.getId(), userDTO.getId(), "Feed Barsik");
         var notifDTO = notificationService.createNotificationTimeout(groupDTO.getId(), petDTO.getId(), "Feed Barsik", 1);
         notificationService.deleteNotification(notifDTO.getId());
@@ -177,7 +179,7 @@ class NotificationServiceImplTest {
         var userDTO = userService.signInNewUser("R1mok", "pass", "Anton");
         var groupDTO = groupService.createGroup(userRepository.getById(userDTO.getId()), "group");
         var group = groupRepository.findAll().get(0);
-        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT);
+        var petDTO = petService.createPet(groupDTO.getId(), "Barsik", "My lover", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var notifDTO = notificationService.createNotificationTimeout(groupDTO.getId(), petDTO.getId(), "Feed Barsik", 1);
         notificationService.setTimeInNotificationNote(userRepository.getById(userDTO.getId()), List.of(notifDTO.getId()));
         var notifNote = notificationNoteRepository.findAll().get(0);

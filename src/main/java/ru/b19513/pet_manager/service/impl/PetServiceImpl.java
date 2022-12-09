@@ -24,10 +24,7 @@ import ru.b19513.pet_manager.service.mapper.PetMapper;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.b19513.pet_manager.consts.Consts.PET_DELETED;
@@ -54,7 +51,7 @@ public class PetServiceImpl implements PetService {
     }
 
     @Override
-    public PetDTO createPet(long groupId, String name, String description, Gender gender, PetType petType) {
+    public PetDTO createPet(long groupId, String name, String description, Gender gender, PetType petType, Date bornDate) {
         var group = groupRepository.findById(groupId).orElseThrow(new NotFoundException("Group with group id: " + groupId + " not found"));
         if (group.getPets() != null &&
                 group.getPets().stream().anyMatch(p -> p.getName().equals(name))) {
@@ -65,6 +62,7 @@ public class PetServiceImpl implements PetService {
                 .group(group)
                 .type(enumMapper.DTOtoEntity(petType))
                 .gender(enumMapper.DTOtoEntity(gender))
+                .bornDate(bornDate)
                 .description(description)
                 .build();
         if (group.getPets() == null) {

@@ -18,7 +18,9 @@ import ru.b19513.pet_manager.service.PetService;
 import ru.b19513.pet_manager.service.mapper.FeedNoteMapper;
 import ru.b19513.pet_manager.service.mapper.PetMapper;
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 
 
@@ -47,7 +49,7 @@ class PetServiceImplTest {
                 .build();
         groupRepository.save(group);
         var group1 = groupRepository.findAll().stream().findAny().get();
-        petService.createPet(group1.getId(), "gavs", "desc", Gender.MALE, PetType.DOG);
+        petService.createPet(group1.getId(), "gavs", "desc", Gender.MALE, PetType.DOG, Date.from(Instant.MIN));
         var pet = petRepository.findAll().stream().findAny().get();
         Assertions.assertTrue(groupRepository.findById(group1.getId()).get().getPets().contains(petRepository.findById(pet.getId()).get()));
         Assertions.assertEquals(petRepository.findById(pet.getId()).get().getGroup(), groupRepository.findById(group1.getId()).get());
@@ -92,8 +94,8 @@ class PetServiceImplTest {
                 .build();
         groupRepository.save(group);
         var groupInRepo = groupRepository.findAll().stream().findAny().get();
-        petService.createPet(groupInRepo.getId(), "Murka", "", Gender.FEMALE, PetType.CAT);
-        petService.createPet(groupInRepo.getId(), "Barsik", "", Gender.MALE, PetType.CAT);
+        petService.createPet(groupInRepo.getId(), "Murka", "", Gender.FEMALE, PetType.CAT, Date.from(Instant.MIN));
+        petService.createPet(groupInRepo.getId(), "Barsik", "", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var pets = new HashSet<>(petRepository.findAll());
         Assertions.assertEquals(petMapper.entityToDTO(pets),
                 petService.getPets(groupInRepo.getId()));
@@ -110,7 +112,7 @@ class PetServiceImplTest {
                 .build();
         groupRepository.save(group);
         var groupInRepo = groupRepository.findAll().get(0);
-        petService.createPet(groupInRepo.getId(), "Barsik", "", Gender.MALE, PetType.CAT);
+        petService.createPet(groupInRepo.getId(), "Barsik", "", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var pet = petRepository.findAll().stream().findAny().get();
         Assertions.assertEquals(1, petService.getPets(groupInRepo.getId()).size());
         petService.deletePet(pet.getId());
@@ -134,7 +136,7 @@ class PetServiceImplTest {
         userRepository.save(user);
         var userInRepo = userRepository.findAll().get(0);
         var groupInRepo = groupRepository.findAll().stream().findAny().get();
-        petService.createPet(groupInRepo.getId(), "Barsik", "", Gender.MALE, PetType.CAT);
+        petService.createPet(groupInRepo.getId(), "Barsik", "", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var petInRepo = petRepository.findAll().get(0);
         petService.createFeedNote(petInRepo.getId(), userInRepo.getId(), "Feed Barsik");
         Assertions.assertEquals(petInRepo, feedNoteRepository.findByPetId(petInRepo.getId()).get(0).getPet());
@@ -160,7 +162,7 @@ class PetServiceImplTest {
         userRepository.save(user);
         var userInRepo = userRepository.findAll().get(0);
         var groupInRepo = groupRepository.findAll().stream().findAny().get();
-        petService.createPet(groupInRepo.getId(), "Barsik", "", Gender.MALE, PetType.CAT);
+        petService.createPet(groupInRepo.getId(), "Barsik", "", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var petInRepo = petRepository.findAll().get(0);
         petService.createFeedNote(petInRepo.getId(), userInRepo.getId(), "Feed Barsik");
         Assertions.assertEquals(feedNoteMapper.entityToDTO(feedNoteRepository.findByPetId(petInRepo.getId()).get(0)),
@@ -178,7 +180,7 @@ class PetServiceImplTest {
         Assertions.assertEquals(feedNoteMapper.entityToDTO(feedNoteRepository.findByPetId(petInRepo.getId()).get(1)),
                 petService.getFeedNotes(petInRepo.getId()).toArray()[1]);
         // test 2 pets with feednotes
-        petService.createPet(group1.getId(), "Murka", "", Gender.FEMALE, PetType.CAT);
+        petService.createPet(group1.getId(), "Murka", "", Gender.FEMALE, PetType.CAT, Date.from(Instant.MIN));
         var pet1InRepo = petRepository.findAll().get(1);
         petService.createFeedNote(pet1InRepo.getId(), userInRepo.getId(), "Feed Murka");
         Assertions.assertEquals(feedNoteMapper.entityToDTO(feedNoteRepository.findByPetId(pet1InRepo.getId()).get(0)),
@@ -204,7 +206,7 @@ class PetServiceImplTest {
         userRepository.save(user);
         var userInRepo = userRepository.findAll().get(0);
         var groupInRepo = groupRepository.findAll().stream().findAny().get();
-        petService.createPet(groupInRepo.getId(), "Barsik", "", Gender.MALE, PetType.CAT);
+        petService.createPet(groupInRepo.getId(), "Barsik", "", Gender.MALE, PetType.CAT, Date.from(Instant.MIN));
         var petInRepo = petRepository.findAll().get(0);
         petService.createFeedNote(petInRepo.getId(), userInRepo.getId(), "Feed Barsik");
         // get 1 feednote

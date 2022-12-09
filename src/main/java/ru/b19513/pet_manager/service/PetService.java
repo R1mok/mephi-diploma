@@ -9,9 +9,10 @@ import ru.b19513.pet_manager.controller.entity.enums.PetType;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 
 public interface PetService {
-    PetDTO createPet(long groupId, String name, String description, Gender gender, PetType petType);
+    PetDTO createPet(long groupId, String name, String description, Gender gender, PetType petType, Date bornDate);
 
     PetDTO updatePet(PetDTO pet);
 

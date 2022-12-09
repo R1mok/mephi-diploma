@@ -3,6 +3,7 @@ package ru.b19513.pet_manager.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +16,13 @@ import ru.b19513.pet_manager.controller.entity.enums.PetType;
 import ru.b19513.pet_manager.repository.entity.User;
 import ru.b19513.pet_manager.service.PetService;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -35,8 +40,10 @@ public class PetsController {
     @Operation(summary = "Добавить нового питомца")
     @PostMapping("/createPet")
     public ResponseEntity<PetDTO> createPet(@RequestParam long groupId, @RequestParam String name,
-                                            @RequestParam Gender gender, @RequestParam PetType petType) {
-        PetDTO petDTO = petService.createPet(groupId, name, "", gender, petType);
+                                            @RequestParam Gender gender, @RequestParam PetType petType,
+                                            @RequestParam String bornDate) throws ParseException {
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        PetDTO petDTO = petService.createPet(groupId, name, "", gender, petType, df.parse(bornDate));
         return ResponseEntity.ok(petDTO);
     }
 
