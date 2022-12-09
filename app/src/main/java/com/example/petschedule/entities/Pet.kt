@@ -6,5 +6,6 @@ data class Pet(
     var petType: String,
     var petGender: String,
     var description: String?,
-    val petParameters: MutableList<PetParameters>?
+    val petParameters: MutableList<PetParameters>?,
+    val bornDate: String
 )

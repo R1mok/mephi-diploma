@@ -2,5 +2,6 @@ package com.example.petschedule.entities
 
 data class FeedNote(
     var id : String,
-    val name : String
+    val name : String,
+    var comment : String,
     )

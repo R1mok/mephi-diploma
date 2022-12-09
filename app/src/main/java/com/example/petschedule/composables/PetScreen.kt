@@ -29,6 +29,8 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.entities.FeedNote
+import com.example.petschedule.entities.Pet
+import org.json.JSONArray
 import org.json.JSONObject
 
 
@@ -60,10 +62,15 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
     var petGender = remember { mutableStateOf("") }
     var petDescription = remember { mutableStateOf("") }
     var petBornDate = remember { mutableStateOf("") }
+    getPetById(token, petId, petType, petGender, petDescription, petBornDate, context)
+
+
+
     var notes = remember {
         mutableStateOf(mutableListOf<FeedNote>())
     }
-    getPetById(token, petId, petType, petGender, petDescription, petBornDate, context)
+    getPetNotificationsByPetId(notes, token, petId, context)
+
 
     Column(
         modifier = Modifier
@@ -90,8 +97,16 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
             style = TextStyle(fontSize = 20.sp, color = Color.Blue)
         )
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
+        var year : String; var month : String; var day : String
+        var date = ""
+        if (petBornDate.value.isNotEmpty()) {
+            year = petBornDate.value.substring(0, 4)
+            month = petBornDate.value.substring(5, 7)
+            day = petBornDate.value.substring(8, 10)
+            date = "$day.$month.$year"
+        }
         Text(
-            text = "Дата рождения питомца: ${petBornDate.value}",
+            text = "Дата рождения питомца: $date",
             style = TextStyle(fontSize = 20.sp, color = Color.Blue)
         )
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
@@ -114,6 +129,14 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
             text = "Список ближайших уведомлений",
             style = TextStyle(fontSize = 20.sp, color = Color.Blue),
         )
+        if (notes.value.size == 0) {Text(
+            text = "Уведомлений пока нет :)",
+            style = TextStyle(fontSize = 18.sp, color = Color.Blue),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(vertical = 5.dp)
+        )
+        }
         LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -122,6 +145,11 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
         ) {
             items(notes.value) {
                 // TODO сделать ближайшие уведомления питомца
+                note ->
+                Text(text = note.comment,
+                color = Color.Blue,
+                fontSize = 30.sp
+                )
             }
         }
     }
@@ -145,7 +173,46 @@ fun getPetById(
             petType.value = obj.getString("type").toString()
             petGender.value = obj.getString("gender").toString()
             petDescription.value = obj.getString("description").toString()
-            petBornDate.value = obj.getString("age").toString()
+            petBornDate.value = obj.getString("bornDate").toString()
+        },
+        { error ->
+            Log.d("MyLog", "Error $error")
+        }) {
+        override fun getHeaders(): MutableMap<String, String> {
+            val headers = HashMap<String, String>()
+            headers["Authorization"] = token
+            return headers
+        }
+    }
+    queue.add(stringRequest)
+}
+
+fun getPetNotificationsByPetId(
+    notes: MutableState<MutableList<FeedNote>>,
+    token: String,
+    petId: String,
+    context: Context) {
+    val url = "http://localhost:8091/pets/$petId/feedNotes"
+    val queue = Volley.newRequestQueue(context)
+    val stringRequest = object : StringRequest(
+        Method.GET,
+        url,
+        { response ->
+            val obj = JSONArray(response)
+            Log.d("MyLog", "obj length = ${obj.length()}")
+            val newNotes = mutableListOf<FeedNote>()
+            for (i in 0 until obj.length()) {
+                Log.d("MyLog", "i = $i, value = ${obj.getString(i)}")
+                val jsonNote = JSONObject(obj.getString(i))
+                newNotes.add(
+                    FeedNote(
+                        "",
+                        "",
+                        jsonNote.get("comment").toString()
+                    )
+                )
+            }
+            notes.value = newNotes
         },
         { error ->
             Log.d("MyLog", "Error $error")

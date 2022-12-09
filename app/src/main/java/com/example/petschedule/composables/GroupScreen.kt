@@ -94,12 +94,12 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
 
     // Declaring a string value to
     // store date in string format
-    val mDate = remember { mutableStateOf("") }
+    val mDate = rememberSaveable { mutableStateOf("") }
 
     val mDatePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-            mDate.value = "$dayOfMonth/${month+1}/$year"
+            mDate.value = "$dayOfMonth.${month+1}.$year"
         }, mYear, mMonth, mDay
     )
 
@@ -135,7 +135,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                 style = TextStyle(fontSize = 20.sp, color = Color.Blue)
             )
         }
-        if (!isExpandedCreatePet) {
+        if (isExpandedCreatePet || pets.value.size == 0) {
             OutlinedTextField(
                 value = petName,
                 onValueChange = { petName = it },
@@ -286,7 +286,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                 }
             ) {
                 Text(
-                    text = "Введите дату рождения питомца",
+                    text = "Введите дату рождения питомца ${mDate.value}",
                     style = TextStyle(color = Color.Blue, fontSize = 20.sp)
                 )
             }
@@ -294,7 +294,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
 
             Button(
                 onClick = {
-                    createPet(pets, context, token, id, petName, petType, petGender)
+                    createPet(pets, context, token, id, petName, petType, petGender, mDate)
                     isExpandedCreatePet = false
                 },
                 modifier = Modifier
@@ -365,20 +365,26 @@ fun createPet(
     id: String,
     name: String,
     petType: String,
-    petGender: String
+    petGender: String,
+    bornDate: MutableState<String>
 ) {
     val url = "http://localhost:8091/pets/createPet?" +
             "groupId=$id" +
             "&name=$name" +
             "&gender=${petGender.uppercase()}" +
-            "&petType=${petType.uppercase()}"
+            "&petType=${petType.uppercase()}" +
+            "&bornDate=${bornDate.value}"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.POST,
         url,
         { response ->
             val obj = JSONObject(response)
-            Log.d("MyLog", "obj length = ${obj.length()}")
+            Log.d("MyLog", "Create pet:" +
+                    " petName:${obj.get("name")}," +
+                    " petGender:${obj.get("gender")}, " +
+                    " petType:${obj.get("type")}," +
+                    " bornDate:${obj.get("bornDate")}")
             getPetsFromGroup(token, id, pets, context)
 
         },
@@ -421,7 +427,8 @@ fun getPetsFromGroup(
                         jsonPet.get("type").toString(),
                         jsonPet.get("gender").toString(),
                         null,
-                        null
+                        null,
+                        jsonPet.get("bornDate").toString()
                     )
                 )
             }
