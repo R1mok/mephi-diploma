@@ -85,8 +85,9 @@ fun MyGroups(navController: NavController, token: String) {
             },
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier
-                .padding(5.dp)
-                .fillMaxWidth(),
+                .padding(horizontal = 5.dp)
+                .fillMaxWidth(0.9f)
+                .align(Alignment.CenterHorizontally),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.White,
                 contentColor = Color.Gray
@@ -94,12 +95,12 @@ fun MyGroups(navController: NavController, token: String) {
         ) {
             Text(
                 text = "Создать группу",
-                color = Color.Blue,
-                fontSize = 30.sp,
+                color = Color.DarkGray,
+                fontSize = 25.sp,
             )
         }
         val focusManager = LocalFocusManager.current
-        if (isCreateGroup) {
+        if (!isCreateGroup && groups.value.size == 0) {
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -109,13 +110,13 @@ fun MyGroups(navController: NavController, token: String) {
                     label = { Text("Имя группы") },
                     textStyle = TextStyle(fontSize = 25.sp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedLabelColor = Color.Blue,
-                        unfocusedLabelColor = Color.Blue,
+                        focusedLabelColor = Color.DarkGray,
+                        unfocusedLabelColor = Color.DarkGray,
                         cursorColor = Color.Black,
-                        focusedBorderColor = Color.Blue,
+                        focusedBorderColor = Color.DarkGray,
                         backgroundColor = Color.White,
-                        unfocusedBorderColor = Color.Blue,
-                        textColor = Color.Blue
+                        unfocusedBorderColor = Color.DarkGray,
+                        textColor = Color.DarkGray
                     ),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -127,10 +128,25 @@ fun MyGroups(navController: NavController, token: String) {
                         }
                     ),
                     modifier = Modifier.padding(vertical = 30.dp)
-                        .fillMaxWidth(0.8f)
+                        .fillMaxWidth(0.9f)
                         .align(Alignment.CenterHorizontally)
                 )
             }
+        }
+        Text(
+            text = "Список групп:",
+            style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        )
+        if (groups.value.size == 0) {
+            Text(
+                text = "Групп пока нет",
+                style = TextStyle(fontSize = 18.sp, color = Color.DarkGray),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(vertical = 5.dp)
+            )
         }
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -158,7 +174,7 @@ fun MyGroups(navController: NavController, token: String) {
                 ) {
                     Text(
                         text = "${group.id}:${group.name}",
-                        color = Color.Blue,
+                        color = Color.DarkGray,
                         fontSize = 30.sp
                     )
                 }

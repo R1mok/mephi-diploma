@@ -58,10 +58,10 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
         PetScreen(navController, token, petId, petName)
     }
     val context = LocalContext.current
-    var petType = remember { mutableStateOf("") }
-    var petGender = remember { mutableStateOf("") }
+    var petType = remember { mutableStateOf("Cat") }
+    var petGender = remember { mutableStateOf("Male") }
     var petDescription = remember { mutableStateOf("") }
-    var petBornDate = remember { mutableStateOf("") }
+    var petBornDate = remember { mutableStateOf("21.10.2019") }
     getPetById(token, petId, petType, petGender, petDescription, petBornDate, context)
 
 
@@ -80,7 +80,7 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
     ) {
         Text(
             text = petName,
-            style = TextStyle(fontSize = 25.sp, color = Color.Blue),
+            style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
             modifier = Modifier
                 .background(color = Color.Transparent)
                 .align(Alignment.CenterHorizontally)
@@ -89,12 +89,12 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
         // TODO информация о здоровье питомца, напоминание о кормежке и ветеринарах
         Text(
             text = "Тип питомца: ${petType.value}",
-            style = TextStyle(fontSize = 20.sp, color = Color.Blue),
+            style = TextStyle(fontSize = 20.sp, color = Color.DarkGray),
         )
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
         Text(
             text = "Пол питомца: ${petGender.value}",
-            style = TextStyle(fontSize = 20.sp, color = Color.Blue)
+            style = TextStyle(fontSize = 20.sp, color = Color.DarkGray)
         )
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
         var year : String; var month : String; var day : String
@@ -107,7 +107,7 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
         }
         Text(
             text = "Дата рождения питомца: $date",
-            style = TextStyle(fontSize = 20.sp, color = Color.Blue)
+            style = TextStyle(fontSize = 20.sp, color = Color.DarkGray)
         )
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
         Button(
@@ -121,17 +121,18 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
             )) {
             Text(
                 text = "Информация о здоровье питомца",
-                style = TextStyle(fontSize = 20.sp, color = Color.Blue)
+                style = TextStyle(fontSize = 20.sp, color = Color.DarkGray)
             )
         }
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
         Text(
             text = "Список ближайших уведомлений",
-            style = TextStyle(fontSize = 20.sp, color = Color.Blue),
+            style = TextStyle(fontSize = 20.sp, color = Color.DarkGray),
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         if (notes.value.size == 0) {Text(
-            text = "Уведомлений пока нет :)",
-            style = TextStyle(fontSize = 18.sp, color = Color.Blue),
+            text = "Уведомлений пока нет",
+            style = TextStyle(fontSize = 18.sp, color = Color.DarkGray),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(vertical = 5.dp)
@@ -147,7 +148,7 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
                 // TODO сделать ближайшие уведомления питомца
                 note ->
                 Text(text = note.comment,
-                color = Color.Blue,
+                color = Color.DarkGray,
                 fontSize = 30.sp
                 )
             }

@@ -67,7 +67,7 @@ fun MainScreen(navController: NavController, token : String) {
             ) {
             Text(
                 text = "Информация об аккаунте",
-                style = TextStyle(fontSize = 25.sp, color = Color.Blue)
+                style = TextStyle(fontSize = 25.sp, color = Color.DarkGray)
             )
         }
         Button(
@@ -86,7 +86,7 @@ fun MainScreen(navController: NavController, token : String) {
             ) {
             Text(
                 text = "Посмотреть свои группы",
-                style = TextStyle(fontSize = 25.sp, color = Color.Blue)
+                style = TextStyle(fontSize = 25.sp, color = Color.DarkGray)
             )
         }
     }

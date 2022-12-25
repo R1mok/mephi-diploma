@@ -44,7 +44,7 @@ fun RegPagePreview() {
     Box(modifier = Modifier
         .fillMaxSize()
         .paint(
-            painter = painterResource(id = R.drawable.background),
+            painter = painterResource(id = R.drawable.background1),
             contentScale = ContentScale.Crop
         )) {
         RegPage(navController = rememberNavController())
@@ -68,9 +68,9 @@ fun RegPage(navController: NavController) {
     ) {
         Text(
             text = "Регистрация",
-            style = TextStyle(fontSize = 25.sp, color = Color.Blue),
+            style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
             modifier = Modifier
-                .background(color = Color.White)
+                .background(color = Color.Transparent)
                 .align(Alignment.CenterHorizontally)
         )
         Row(
@@ -161,9 +161,9 @@ fun RegPage(navController: NavController) {
         ) {
             Text(
                 text = "Зарегистрироваться",
-                style = TextStyle(fontSize = 25.sp, color = Color.Blue),
+                style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
                 modifier = Modifier
-                    .background(color = Color.White)
+                    .background(color = Color.Transparent)
             )
         }
     }

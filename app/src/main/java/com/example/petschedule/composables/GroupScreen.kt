@@ -111,14 +111,14 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
     ) {
         Text(
             text = name,
-            style = TextStyle(fontSize = 25.sp, color = Color.Blue),
+            style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
             modifier = Modifier
                 .background(color = Color.Transparent)
                 .align(Alignment.CenterHorizontally)
         )
         Button(
             modifier = Modifier
-                .fillMaxWidth(0.8f)
+                .fillMaxWidth(0.9f)
                 .align(Alignment.CenterHorizontally)
                 .padding(vertical = 20.dp),
             onClick = {
@@ -132,7 +132,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
         ) {
             Text(
                 text = "Добавить нового питомца",
-                style = TextStyle(fontSize = 20.sp, color = Color.Blue)
+                style = TextStyle(fontSize = 23.sp, color = Color.DarkGray)
             )
         }
         if (isExpandedCreatePet || pets.value.size == 0) {
@@ -142,15 +142,16 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                 label = { Text(text = "Имя питомца") },
                 textStyle = TextStyle(fontSize = 25.sp),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedLabelColor = Color.Blue,
-                    unfocusedLabelColor = Color.Blue,
+                    focusedLabelColor = Color.DarkGray,
+                    unfocusedLabelColor = Color.DarkGray,
                     cursorColor = Color.Black,
-                    focusedBorderColor = Color.Blue,
+                    focusedBorderColor = Color.DarkGray,
                     backgroundColor = Color.White,
-                    unfocusedBorderColor = Color.Blue,
-                    textColor = Color.Blue
+                    unfocusedBorderColor = Color.DarkGray,
+                    textColor = Color.DarkGray
                 )
             )
+            Spacer(modifier = Modifier.padding(vertical = 5.dp))
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -166,14 +167,14 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                         text = "Выбрать тип питомца: ",
                         style = TextStyle(
                             fontSize = 20.sp,
-                            color = Color.Blue
+                            color = Color.DarkGray
                         )
                     )
                     Text(
                         text = petType,
                         style = TextStyle(
                             fontSize = 20.sp,
-                            color = Color.Blue
+                            color = Color.DarkGray
                         ),
                         modifier = Modifier
                             .background(color = Color.White)
@@ -190,7 +191,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                             text = "Dog",
                             style = TextStyle(
                                 fontSize = 20.sp,
-                                color = Color.Blue
+                                color = Color.DarkGray
                             ),
                             modifier = Modifier
                                 .clickable(onClick = {
@@ -202,7 +203,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                             text = "Cat",
                             style = TextStyle(
                                 fontSize = 20.sp,
-                                color = Color.Blue
+                                color = Color.DarkGray
                             ),
                             modifier = Modifier
                                 .clickable(onClick = {
@@ -213,6 +214,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                     }
                 }
             }
+            Spacer(modifier = Modifier.padding(vertical = 5.dp))
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -228,14 +230,14 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                         text = "Выбрать пол питомца: ",
                         style = TextStyle(
                             fontSize = 20.sp,
-                            color = Color.Blue
+                            color = Color.DarkGray
                         )
                     )
                     Text(
                         text = petGender,
                         style = TextStyle(
                             fontSize = 20.sp,
-                            color = Color.Blue
+                            color = Color.DarkGray
                         ),
                         modifier = Modifier
                             .background(color = Color.White)
@@ -252,7 +254,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                             text = "Male",
                             style = TextStyle(
                                 fontSize = 20.sp,
-                                color = Color.Blue
+                                color = Color.DarkGray
                             ),
                             modifier = Modifier
                                 .clickable(onClick = {
@@ -264,7 +266,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                             text = "Female",
                             style = TextStyle(
                                 fontSize = 20.sp,
-                                color = Color.Blue
+                                color = Color.DarkGray
                             ),
                             modifier = Modifier
                                 .clickable(onClick = {
@@ -275,6 +277,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                     }
                 }
             }
+            Spacer(modifier = Modifier.padding(vertical = 5.dp))
             Button(
                 shape = RoundedCornerShape(15.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -287,11 +290,9 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
             ) {
                 Text(
                     text = "Введите дату рождения питомца ${mDate.value}",
-                    style = TextStyle(color = Color.Blue, fontSize = 20.sp)
+                    style = TextStyle(color = Color.DarkGray, fontSize = 20.sp)
                 )
             }
-            // TODO ввести возраст питомца
-
             Button(
                 onClick = {
                     createPet(pets, context, token, id, petName, petType, petGender, mDate)
@@ -309,20 +310,20 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
             ) {
                 Text(
                     text = "Добавить",
-                    style = TextStyle(color = Color.Blue, fontSize = 20.sp)
+                    style = TextStyle(color = Color.DarkGray, fontSize = 20.sp)
                 )
             }
         }
         Text(
             text = "Список питомцев",
-            style = TextStyle(fontSize = 25.sp, color = Color.Blue),
+            style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
         )
         if (pets.value.size == 0) {
             Text(
-                text = "Питомцев пока нет :)",
-                style = TextStyle(fontSize = 18.sp, color = Color.Blue),
+                text = "Питомцев пока нет",
+                style = TextStyle(fontSize = 18.sp, color = Color.DarkGray),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(vertical = 5.dp)
@@ -348,7 +349,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
                 ) {
                     Text(
                         text = "${pet.id}: ${pet.name}",
-                        color = Color.Blue,
+                        color = Color.DarkGray,
                         fontSize = 30.sp
                     )
                 }
