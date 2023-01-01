@@ -17,13 +17,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,7 +34,6 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.entities.FeedNote
-import com.example.petschedule.entities.Pet
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -52,17 +50,21 @@ fun PetScreenPreview() {
                 contentScale = ContentScale.Crop
             )
     ) {
-        PetScreen(navController = rememberNavController(), "", "", "Barsik")
+        PetScreen(navController = rememberNavController(), "", "", "Barsik", "1")
     }
 }
 
-
-@OptIn(ExperimentalTextApi::class)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
-fun PetScreen(navController: NavController, token: String, petId: String, petName: String) {
+fun PetScreen(
+    navController: NavController,
+    token: String,
+    petId: String,
+    petName: String,
+    groupId: String
+) {
     if (false) {
-        PetScreen(navController, token, petId, petName)
+        PetScreen(navController, token, petId, petName, groupId)
     }
     val context = LocalContext.current
     var petType = remember { mutableStateOf("Cat") }
@@ -74,7 +76,15 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
     var isExpandedCreateNote by remember {
         mutableStateOf(false)
     }
-
+    var isExpandedCreateNotification by remember {
+        mutableStateOf(false)
+    }
+    var isExpandedCreateTimeout by remember {
+        mutableStateOf(false)
+    }
+    var isExpandedCreateSchedule by remember {
+        mutableStateOf(false)
+    }
 
     var notes = remember {
         mutableStateOf(mutableListOf<FeedNote>())
@@ -107,14 +117,14 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
             style = TextStyle(fontSize = 20.sp, color = Color.DarkGray)
         )
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
-        var year: String;
-        var month: String;
+        var year: String
+        var month: String
         var day: String
         var date = ""
         if (petBornDate.value.isNotEmpty()) {
             year = petBornDate.value.substring(0, 4)
             month = petBornDate.value.substring(5, 7)
-            day = petBornDate.value.substring(8, 10)
+            day = petBornDate.value.substring(8, 10).toInt().plus(1).toString()
             date = "$day.$month.$year"
         }
         Text(
@@ -125,7 +135,7 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
         Button(
             onClick = {
                 // TODO переход на страницу статистики здоровья питомца (рост/вес)
-                     // TODO похода к ветеринару
+                // TODO похода к ветеринару
             },
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier
@@ -161,12 +171,12 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
             )
         }
         val focusManager = LocalFocusManager.current
-        var comment by rememberSaveable { mutableStateOf("") }
+        var noteComment by rememberSaveable { mutableStateOf("") }
         if (isExpandedCreateNote) {
             OutlinedTextField(
-                value = comment,
-                onValueChange = { comment = it },
-                label = { Text("Уведомление") },
+                value = noteComment,
+                onValueChange = { noteComment = it },
+                label = { Text("Запись") },
                 textStyle = TextStyle(fontSize = 25.sp),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedLabelColor = Color.DarkGray,
@@ -181,10 +191,10 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        createFeedNote(notes, token, petId, context, comment)
+                        createFeedNote(notes, token, petId, context, noteComment)
                         isExpandedCreateNote = false
                         focusManager.clearFocus()
-                        comment = ""
+                        noteComment = ""
                     }
                 ),
                 modifier = Modifier
@@ -192,6 +202,131 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)
             )
+        }
+        Spacer(modifier = Modifier.padding(vertical = 10.dp))
+        Button(
+            onClick = {
+                isExpandedCreateNotification = !isExpandedCreateNotification
+            },
+            shape = RoundedCornerShape(15.dp),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.White
+            )
+        ) {
+            Text(
+                text = "Добавить новое напоминание",
+                style = TextStyle(fontSize = 20.sp, color = Color.DarkGray)
+            )
+        }
+        Spacer(modifier = Modifier.padding(vertical = 10.dp))
+        if (isExpandedCreateNotification) {
+            Row {
+                Button(
+                    onClick = {
+                        isExpandedCreateTimeout = !isExpandedCreateTimeout
+                    },
+                    shape = RoundedCornerShape(15.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(0.5f),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Отсчет",
+                        style = TextStyle(fontSize = 20.sp, color = Color.DarkGray)
+                    )
+                }
+                Spacer(modifier = Modifier.padding(horizontal = 10.dp))
+                Button(
+                    onClick = {
+                        isExpandedCreateSchedule = !isExpandedCreateSchedule
+                    },
+                    shape = RoundedCornerShape(15.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Расписание",
+                        style = TextStyle(fontSize = 20.sp, color = Color.DarkGray)
+                    )
+                }
+            }
+            var timeoutComment by rememberSaveable { mutableStateOf("") }
+            var elapsed by rememberSaveable {
+                mutableStateOf("")
+            }
+            if (isExpandedCreateTimeout) {
+                OutlinedTextField(
+                    value = timeoutComment,
+                    onValueChange = { timeoutComment = it },
+                    label = { Text("Сообщение в напоминании") },
+                    textStyle = TextStyle(fontSize = 25.sp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedLabelColor = Color.DarkGray,
+                        unfocusedLabelColor = Color.DarkGray,
+                        cursorColor = Color.Black,
+                        focusedBorderColor = Color.DarkGray,
+                        backgroundColor = Color.White,
+                        unfocusedBorderColor = Color.DarkGray,
+                        textColor = Color.DarkGray
+                    ),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    ),
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
+                )
+
+
+                OutlinedTextField(
+                    value = elapsed,
+                    onValueChange = { elapsed = it },
+                    label = { Text("Время срабатывания (в секундах)") },
+                    textStyle = TextStyle(fontSize = 25.sp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedLabelColor = Color.DarkGray,
+                        unfocusedLabelColor = Color.DarkGray,
+                        cursorColor = Color.Black,
+                        focusedBorderColor = Color.DarkGray,
+                        backgroundColor = Color.White,
+                        unfocusedBorderColor = Color.DarkGray,
+                        textColor = Color.DarkGray
+                    ),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            createTimeout(context, token, groupId, timeoutComment, petId, elapsed)
+                            isExpandedCreateTimeout = false
+                            focusManager.clearFocus()
+                            elapsed = ""
+                        }
+                    ),
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
+            //var scheduleComment by rememberSaveable { mutableStateOf("") }
+            if (isExpandedCreateSchedule) {
+
+            }
         }
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
         Text(
@@ -215,7 +350,9 @@ fun PetScreen(navController: NavController, token: String, petId: String, petNam
         ) {
             items(notes.value) { note ->
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 5.dp),
                     border = BorderStroke(1.dp, Color.White),
                     backgroundColor = Color.Transparent
                 ) {
@@ -326,6 +463,32 @@ fun createFeedNote(
             return "application/json"
         }
 
+        override fun getHeaders(): MutableMap<String, String> {
+            val headers = HashMap<String, String>()
+            headers["Authorization"] = token
+            return headers
+        }
+    }
+    queue.add(stringRequest)
+}
+fun createTimeout(
+    context: Context,
+    token: String,
+    groupId: String,
+    comment: String,
+    petId: String,
+    elapsed: String
+) {
+    val url = "http://localhost:8091/notifications/timeout/?" +
+            "groupId=$groupId&comment=$comment&petId=$petId&elapsed=$elapsed"
+    val queue = Volley.newRequestQueue(context)
+    val stringRequest = object : StringRequest(
+        Method.POST,
+        url,
+        { },
+        { error ->
+            Log.d("MyLog", "Error $error")
+        }) {
         override fun getHeaders(): MutableMap<String, String> {
             val headers = HashMap<String, String>()
             headers["Authorization"] = token

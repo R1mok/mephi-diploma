@@ -28,15 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.android.volley.AuthFailureError
-import com.android.volley.NetworkResponse
-import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.entities.User
-import com.example.petschedule.entities.UserRegister
-import org.json.JSONObject
 
 @Preview
 @Composable

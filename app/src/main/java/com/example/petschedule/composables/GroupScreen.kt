@@ -5,7 +5,6 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.util.Log
 import android.widget.DatePicker
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -31,7 +30,6 @@ import androidx.navigation.compose.rememberNavController
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
-import com.example.petschedule.entities.Group
 import com.example.petschedule.entities.Pet
 import org.json.JSONArray
 import org.json.JSONObject
@@ -56,7 +54,7 @@ fun GroupScreenPreview() {
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
-fun GroupScreen(navController: NavController, token: String, id: String, name: String) {
+fun GroupScreen(navController: NavController, token: String, groupId: String, name: String) {
     val context = LocalContext.current
     var petName by rememberSaveable { mutableStateOf("") }
     var petType by rememberSaveable {
@@ -68,7 +66,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
     var pets = remember {
         mutableStateOf(mutableListOf<Pet>())
     }
-    getPetsFromGroup(token, id, pets, context)
+    getPetsFromGroup(token, groupId, pets, context)
 
     var isExpandedCreatePet by remember {
         mutableStateOf(false)
@@ -295,7 +293,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
             }
             Button(
                 onClick = {
-                    createPet(pets, context, token, id, petName, petType, petGender, mDate)
+                    createPet(pets, context, token, groupId, petName, petType, petGender, mDate)
                     isExpandedCreatePet = false
                 },
                 modifier = Modifier
@@ -338,7 +336,7 @@ fun GroupScreen(navController: NavController, token: String, id: String, name: S
             items(pets.value) { pet ->
                 Button(
                     onClick = {
-                        navController.navigate(Screen.PetScreen.withArgs(token, pet.id, pet.name))
+                        navController.navigate(Screen.PetScreen.withArgs(token, pet.id, pet.name, groupId))
                     },
                     shape = RoundedCornerShape(15.dp),
                     modifier = Modifier.padding(5.dp),
