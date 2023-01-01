@@ -16,9 +16,9 @@ import java.util.List;
 public class NotificationTimeoutDTO extends NotificationDTO{
 
     @Builder
-    public NotificationTimeoutDTO(long id, long groupId, boolean enabled, String comment,
+    public NotificationTimeoutDTO(long id, long groupId, boolean enabled, String comment, String groupName, String petName,
             List<Period> periods, long elapsed) {
-        super(id, groupId, enabled, comment);
+        super(id, groupId, enabled, comment, groupName, petName);
         this.elapsed = elapsed;
         this.periods = periods;
     }

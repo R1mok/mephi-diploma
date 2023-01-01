@@ -16,12 +16,17 @@ import java.util.List;
 
 @Mapper
 public interface NotificationMapper {
-    @Mapping(target = "times", expression = "java(entity.getTimes().stream().map(t -> t.getNotifTime()).collect(java.util.stream.Collectors.toList()))")
+    @Mapping(target = "times",
+            expression = "java(entity.getTimes().stream().map(t -> t.getNotifTime()).collect(java.util.stream.Collectors.toList()))")
+    @Mapping(target = "petName", expression = "java(entity.getPet().getName())")
+    @Mapping(target = "groupName", expression = "java(entity.getGroup().getName())")
     NotificationScheduleDTO entityToDTO(NotificationSchedule entity);
 
     @Mapping(target = "times", expression = "java(entity.getTimes())")
     void updateEntity(@MappingTarget NotificationSchedule entity, NotificationScheduleDTO src);
 
+    @Mapping(target = "petName", expression = "java(entity.getPet().getName())")
+    @Mapping(target = "groupName", expression = "java(entity.getGroup().getName())")
     NotificationTimeoutDTO entityToDTO(NotificationTimeout entity);
 
     default List<NotificationDTO> entityToDTO(Collection<Notification> entities) {

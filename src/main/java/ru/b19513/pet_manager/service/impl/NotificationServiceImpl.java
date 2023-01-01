@@ -31,16 +31,19 @@ public class NotificationServiceImpl implements NotificationService {
     private final GroupRepository groupRepository;
     private final PetRepository petRepository;
     private final FeedNoteRepository feedNoteRepository;
+
+    private final UserRepository userRepository;
     private final NotificationMapper notificationMapper;
 
     @Autowired
-    public NotificationServiceImpl(NotificationNoteRepository notificationNoteRepository, NotificationRepository notificationRepository, GroupRepository groupRepository, PetRepository petRepository, FeedNoteRepository feedNoteRepository, NotificationMapper notificationMapper) {
+    public NotificationServiceImpl(NotificationNoteRepository notificationNoteRepository, NotificationRepository notificationRepository, GroupRepository groupRepository, PetRepository petRepository, FeedNoteRepository feedNoteRepository, UserRepository userRepository, NotificationMapper notificationMapper) {
 
         this.notificationNoteRepository = notificationNoteRepository;
         this.notificationRepository = notificationRepository;
         this.groupRepository = groupRepository;
         this.petRepository = petRepository;
         this.feedNoteRepository = feedNoteRepository;
+        this.userRepository = userRepository;
         this.notificationMapper = notificationMapper;
     }
 
@@ -121,7 +124,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public List<NotificationDTO> showNotification(User user) {
+    public List<NotificationDTO> showNotification(User userFromQuery) {
+        var user = userRepository.findById(userFromQuery.getId())
+                .orElseThrow(new NotFoundException("user with id " + userFromQuery.getId() + " not found"));
         Set<Group> groupSet;
         if (user.getGroups() == null) {
             groupSet = new HashSet<>();

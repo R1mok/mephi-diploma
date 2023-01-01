@@ -15,9 +15,9 @@ import lombok.Setter;
 public class NotificationScheduleDTO extends NotificationDTO {
 
     @Builder
-    public NotificationScheduleDTO(long id, long groupId, boolean enabled, String comment,
+    public NotificationScheduleDTO(long id, long groupId, boolean enabled, String comment, String groupName, String petName,
             List<LocalTime> times) {
-        super(id, groupId, enabled, comment);
+        super(id, groupId, enabled, comment, groupName, petName);
         this.times = times;
     }
 

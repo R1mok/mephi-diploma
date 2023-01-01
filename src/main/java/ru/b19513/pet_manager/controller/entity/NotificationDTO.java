@@ -18,4 +18,8 @@ public abstract class NotificationDTO {
     private boolean enabled;
     @Schema(description = "Комментарий к уведомлению")
     private String comment;
+    @Schema(description = "Имя группы")
+    private String groupName;
+    @Schema(description = "Имя питомца")
+    private String petName;
 }
