@@ -61,7 +61,7 @@ public class NotificationController {
     @Operation(summary = "Показать напоминания.")
     @GetMapping("/show")
     public ResponseEntity<List<NotificationDTO>> showNotification(Authentication auth){
-        var user = ((User)auth.getDetails());
+        var user = ((User)auth.getPrincipal());
         var notificationList = notificationService.showNotification(user);
         return ResponseEntity.ok(notificationList);
     }
