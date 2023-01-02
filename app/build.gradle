@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.gms.google-services'
+    //id 'com.google.gms.google-services'
 }
 
 android {
@@ -79,6 +79,10 @@ dependencies {
     //noinspection GradleDependency
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
 
-    implementation platform('com.google.firebase:firebase-bom:31.1.1')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    // firebase
+    //implementation platform('com.google.firebase:firebase-bom:31.1.1')
+    //implementation 'com.google.firebase:firebase-analytics-ktx'
+
+    // Work Manager
+    implementation "androidx.work:work-runtime-ktx:2.7.1"
 }
