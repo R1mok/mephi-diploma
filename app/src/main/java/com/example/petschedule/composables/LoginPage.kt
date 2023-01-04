@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.android.volley.*
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.petschedule.MainActivity
 import com.example.petschedule.R
 import com.example.petschedule.entities.User
 import org.json.JSONObject
@@ -190,6 +191,7 @@ fun authLogin(
             val obj = JSONObject(response)
             user.value.token = obj.getString("token")
             Log.d("MyLog", "Token: ${user.value.token}")
+            MainActivity.TOKEN = user.value.token
             navController
                 .navigate(Screen.MainScreen.withArgs(user.value.token))
         },

@@ -1,10 +1,7 @@
 package com.example.petschedule.composables
 
 import android.annotation.SuppressLint
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -31,22 +28,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.entities.FeedNote
-import com.example.petschedule.services.NotificationWorker
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.concurrent.TimeUnit
 
 
 @Preview
@@ -490,8 +479,9 @@ fun createTimeout(
     petId: String,
     elapsed: String
 ) {
+    val splitedComment = comment.replace(" ", "%20")
     val url = "http://localhost:8091/notifications/timeout/?" +
-            "groupId=$groupId&comment=$comment&petId=$petId&elapsed=$elapsed"
+            "groupId=$groupId&comment=$splitedComment&petId=$petId&elapsed=$elapsed"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.POST,

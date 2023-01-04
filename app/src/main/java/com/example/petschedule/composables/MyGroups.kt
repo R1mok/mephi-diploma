@@ -3,8 +3,6 @@ package com.example.petschedule.composables
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import android.view.KeyEvent.KEYCODE_ENTER
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,14 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -58,7 +52,6 @@ fun MyGroupsPreview() {
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun MyGroups(navController: NavController, token: String) {
@@ -100,7 +93,7 @@ fun MyGroups(navController: NavController, token: String) {
             )
         }
         val focusManager = LocalFocusManager.current
-        if (!isCreateGroup && groups.value.size == 0) {
+        if (isCreateGroup || groups.value.size == 0) {
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {

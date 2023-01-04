@@ -1,32 +1,32 @@
 package com.example.petschedule
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.work.OneTimeWorkRequest
-import androidx.work.PeriodicWorkRequest
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import com.example.petschedule.services.NotificationWorker
 import com.example.petschedule.ui.theme.PetScheduleTheme
-import java.util.concurrent.TimeUnit
 
 
 class MainActivity : ComponentActivity() {
 
-    private val workManager = WorkManager.getInstance(application)
+    init {
+        instance = this
+    }
+    companion object {
+        var TOKEN = ""
 
-    internal fun applyNotifications() {
-        workManager.enqueue(PeriodicWorkRequestBuilder<NotificationWorker>(30, TimeUnit.SECONDS).build())
+        private var instance: MainActivity? = null
+
+        fun applicationContext() : Context {
+            return instance!!.applicationContext
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +42,6 @@ class MainActivity : ComponentActivity() {
                         )
                 )
                 Navigation()
-                applyNotifications()
             }
         }
     }
