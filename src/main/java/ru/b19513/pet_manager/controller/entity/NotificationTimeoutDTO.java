@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.b19513.pet_manager.repository.entity.Period;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -25,6 +26,8 @@ public class NotificationTimeoutDTO extends NotificationDTO{
 
     @Schema(description = "Время, через которое нужно послать уведомление (в секундах)")
     private long elapsed;
+    @Schema(description = "Время отсчета уведомления")
+    private LocalDateTime time;
     @Schema(description = "Список периодов, когда не нужно посылать уведомления")
     private List<Period> periods;
 }

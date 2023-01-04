@@ -74,9 +74,9 @@ public class NotificationController {
     }
 
     @Operation(summary = "Проставить текущее время в напоминаниях, которые уже были показаны.")
-    @PatchMapping("/setTime/{userId}")
-    public ResponseEntity<StatusDTO> setTimeInNotificationNote(Authentication auth, @RequestParam List<Long> notificationsId){
-        var user = ((User)auth.getDetails());
+    @PatchMapping("/setTime")
+    public ResponseEntity<StatusDTO> setTimeInNotificationNote(Authentication auth, @RequestBody List<Long> notificationsId){
+        var user = ((User)auth.getPrincipal());
         var status = notificationService.setTimeInNotificationNote(user, notificationsId);
         return ResponseEntity.ok(status);
     }

@@ -3,6 +3,7 @@ package ru.b19513.pet_manager.repository.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -20,6 +21,9 @@ public class NotificationTimeout extends Notification {
     }
     @Column
     private long elapsed;
+
+    @Column
+    private LocalDateTime time;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "notification")
     private List<Period> times;

@@ -60,6 +60,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .comment(comment)
                 .enabled(true)
                 .build();
+        notificationTimeout.setTime(LocalDateTime.now());
         var notifSet = pet.getNotifications(); // добавляю к питомцу созданное уведомление
         if (notifSet == null) {
             notifSet = new HashSet<>();
@@ -69,8 +70,9 @@ public class NotificationServiceImpl implements NotificationService {
         if (group.getNotificationList() == null) {
             group.setNotificationList(new ArrayList<>());
         }
-        group.getNotificationList().addAll(notifSet);
         var notifInRepo = notificationRepository.save(notificationTimeout);
+        group.getNotificationList().addAll(notifSet);
+        //groupRepository.save(group);
         return notificationMapper.entityToDTO(notifInRepo);
     }
 
@@ -134,27 +136,30 @@ public class NotificationServiceImpl implements NotificationService {
         if (user.getOwnedGroups() != null)
             groupSet.addAll(user.getOwnedGroups());
         List<Notification> notificationList = new ArrayList<>();
-        groupSet.forEach(g -> notificationList.addAll(g.getNotificationList()));
+        groupSet.forEach(g -> notificationList.addAll(
+                notificationRepository.findAllByGroupId(g.getId())
+        ));
         List<NotificationDTO> resultNotificationList = new ArrayList<>();
         for (var notification : notificationList) {
             if (notification instanceof NotificationTimeout) {
                 var notif = (NotificationTimeout) notification;
                 var pet = notif.getPet();
-                var fn = feedNoteRepository.findFirstByPetIdOrderByDateTimeDesc(pet.getId());
-                if (fn != null) {
-                    LocalDateTime alarmTime = fn.getDateTime().plusSeconds((notif.getElapsed()));
-                    boolean notTimeToSend = false;
-                    if (notif.getTimes() != null)
-                        for (var period : notif.getTimes()) {
-                            if (alarmTime.isAfter(ChronoLocalDateTime.from(period.getTimeFrom())) &&
-                                    alarmTime.isBefore(ChronoLocalDateTime.from(period.getTimeTo()))) {
-                                notTimeToSend = true;
-                            }
+                //var fn = feedNoteRepository.findFirstByPetIdOrderByDateTimeDesc(pet.getId());
+                //if (fn != null) {
+                //LocalDateTime alarmTime = fn.getDateTime().plusSeconds((notif.getElapsed()));
+                var alarmTime = notif.getTime().plusSeconds(notif.getElapsed());
+                boolean notTimeToSend = false;
+                //if (notif.getTimes() != null)
+                    for (var period : notif.getTimes()) {
+                        if (alarmTime.isAfter(ChronoLocalDateTime.from(period.getTimeFrom())) &&
+                                alarmTime.isBefore(ChronoLocalDateTime.from(period.getTimeTo()))) {
+                            notTimeToSend = true;
                         }
-                    if (!notTimeToSend && alarmTime.isBefore(ChronoLocalDateTime.from(LocalDateTime.now()))) {
-                        resultNotificationList.add(notificationMapper.entityToDTO(notif));
-                    }
+                   }
+                if (!notTimeToSend && alarmTime.isBefore(ChronoLocalDateTime.from(LocalDateTime.now()))) {
+                    resultNotificationList.add(notificationMapper.entityToDTO(notif));
                 }
+                //}
             } else if (notification instanceof NotificationSchedule) {
                 var notif = (NotificationSchedule) notification;
                 var times = notif.getTimes();
@@ -180,8 +185,8 @@ public class NotificationServiceImpl implements NotificationService {
         var group = notification.getGroup();
         group.getNotificationList().remove(notification);
         var pet = notification.getPet();
-        notificationRepository.delete(notification);
         pet.getNotifications().remove(notification);
+        notificationRepository.delete(notification);
         return StatusDTO.builder()
                 .status(HttpStatus.OK)
                 .description(NOTIFICATION_DELETED)
