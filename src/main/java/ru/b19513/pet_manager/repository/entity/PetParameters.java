@@ -3,7 +3,7 @@ package ru.b19513.pet_manager.repository.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.Instant;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -28,5 +28,5 @@ public class PetParameters {
     private double weight;
 
     @Column
-    private Instant time;
+    private Date date;
 }

@@ -13,6 +13,8 @@ import ru.b19513.pet_manager.controller.entity.PetParametersDTO;
 import ru.b19513.pet_manager.controller.entity.StatusDTO;
 import ru.b19513.pet_manager.controller.entity.enums.Gender;
 import ru.b19513.pet_manager.controller.entity.enums.PetType;
+import ru.b19513.pet_manager.repository.entity.Pet;
+import ru.b19513.pet_manager.repository.entity.PetParameters;
 import ru.b19513.pet_manager.repository.entity.User;
 import ru.b19513.pet_manager.service.PetService;
 
@@ -101,11 +103,19 @@ public class PetsController {
     }
 
     @Operation(summary = "Добавить запись о росте и весе")
-    @PostMapping("/parameters/add")
-    public ResponseEntity<PetDTO> addParametersOfPet(@RequestParam long petId,
+    @PostMapping("/parameters/add/{petId}")
+    public ResponseEntity<PetDTO> addParametersOfPet(@PathVariable long petId,
                                                                      @RequestParam double weight,
-                                                                     @RequestParam double height) {
-        return ResponseEntity.ok(petService.addNewParameter(petId, Instant.now(), weight, height));
-
+                                                                     @RequestParam double height,
+                                                     @RequestParam String date) throws ParseException {
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        return ResponseEntity.ok(petService.addNewParameter(petId, df.parse(date), weight, height));
+    }
+    
+    @Operation(summary = "Получить записи роста и веса")
+    @GetMapping("/parameters/get/{petId}")
+    public ResponseEntity<Collection<PetParametersDTO>> getPetParameters(@PathVariable long petId) {
+        var petParametersList = petService.getPetParameters(petId);
+        return ResponseEntity.ok(petParametersList);
     }
 }

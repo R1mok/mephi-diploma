@@ -2,11 +2,11 @@ package ru.b19513.pet_manager.service;
 
 import ru.b19513.pet_manager.controller.entity.FeedNoteDTO;
 import ru.b19513.pet_manager.controller.entity.PetDTO;
+import ru.b19513.pet_manager.controller.entity.PetParametersDTO;
 import ru.b19513.pet_manager.controller.entity.StatusDTO;
 import ru.b19513.pet_manager.controller.entity.enums.Gender;
 import ru.b19513.pet_manager.controller.entity.enums.PetType;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
@@ -28,5 +28,7 @@ public interface PetService {
 
     Collection<FeedNoteDTO> findFeedNotesByDate(long petId, LocalDateTime from, LocalDateTime to);
 
-    PetDTO addNewParameter(long petId, Instant time, double weight, double height);
+    PetDTO addNewParameter(long petId, Date time, double weight, double height);
+
+    Collection<PetParametersDTO> getPetParameters(long petId);
 }
