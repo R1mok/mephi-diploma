@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.Instant;
+import java.util.Date;
 
 @Data
 @Builder
@@ -15,5 +15,5 @@ public class PetParametersDTO {
     @Schema(description = "Вес животного")
     private double weight;
     @Schema(description = "Время замера")
-    private Instant time;
+    private Date date;
 }
