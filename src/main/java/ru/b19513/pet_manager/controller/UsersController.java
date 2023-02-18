@@ -78,4 +78,10 @@ public class    UsersController {
         List<UserDTO> userDTO = userService.findUsersByLogin(loginBegining);
         return ResponseEntity.ok(userDTO);
     }
+
+    @Operation(summary = "Получить id пользователя по логину")
+    @GetMapping("/getUserByLogin/{login}")
+    public ResponseEntity<Long> getUserIdByLogin(@PathVariable String login) {
+        return ResponseEntity.ok(userService.getUserIdByLogin(login));
+    }
 }

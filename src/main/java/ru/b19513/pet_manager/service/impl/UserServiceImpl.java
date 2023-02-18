@@ -117,6 +117,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Long getUserIdByLogin(String login) {
+        if (userRepository.findByLogin(login).isPresent()) {
+            return userRepository.findByLogin(login).get().getId();
+        } else {
+            throw new NotFoundException("User with login " + login + " not found");
+        }
+    }
+
+    @Override
     public UserDTO getUser(User user) {
         return userMapper.entityToDTO(user);
     }

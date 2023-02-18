@@ -22,4 +22,5 @@ public interface UserService{
 
     List<UserDTO> findUsersByLogin(String login);
     UserDTO getUser(User user);
+    Long getUserIdByLogin(String login);
 }
