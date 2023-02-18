@@ -49,6 +49,31 @@ fun Navigation() {
             LoginPage(navController = navController)
         }
         composable(
+            route = Screen.PetHealth.route + "/{token}" + "/{petId}" + "/{petName}",
+            arguments = listOf(
+                navArgument("token") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                },
+                navArgument("petId") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                },
+                navArgument ("petName") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                },
+            )
+        ) { entry ->
+            val token = entry.arguments?.getString("token").toString()
+            val petId = entry.arguments?.getString("petId").toString()
+            val petName = entry.arguments?.getString("petName").toString()
+            PetHealth(token, petId, petName)
+        }
+        composable(
             route = Screen.MyGroups.route + "/{token}",
             arguments = listOf(
                 navArgument("token") {

@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,12 +31,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.android.volley.NetworkResponse
+import com.android.volley.ParseError
+import com.android.volley.Response
+import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.entities.FeedNote
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.UnsupportedEncodingException
+import java.nio.charset.Charset
 
 
 @Preview
@@ -105,7 +112,6 @@ fun PetScreen(
                 .align(Alignment.CenterHorizontally)
         )
         Spacer(modifier = Modifier.padding(vertical = 20.dp))
-        // TODO информация о здоровье питомца, напоминание о кормежке и ветеринарах
         Text(
             text = "Тип питомца: ${petType.value}",
             style = TextStyle(fontSize = 20.sp, color = Color.DarkGray),
@@ -133,7 +139,7 @@ fun PetScreen(
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
         Button(
             onClick = {
-                // TODO переход на страницу статистики здоровья питомца (рост/вес)
+                navController.navigate(Screen.PetHealth.withArgs(token, petId, petName))
                 // TODO похода к ветеринару
             },
             shape = RoundedCornerShape(15.dp),
@@ -230,7 +236,7 @@ fun PetScreen(
                     },
                     shape = RoundedCornerShape(15.dp),
                     modifier = Modifier
-                        .fillMaxWidth(0.5f),
+                        .fillMaxWidth(0.4f),
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Color.White,
                         contentColor = Color.White
@@ -263,6 +269,15 @@ fun PetScreen(
             var elapsed by rememberSaveable {
                 mutableStateOf("")
             }
+            var isExpandedTimeoutUnits by remember {
+                mutableStateOf(false)
+            }
+            var timeUnitInt by rememberSaveable {
+                mutableStateOf(0)
+            }
+            var timeUnitString by rememberSaveable {
+                mutableStateOf("")
+            }
             if (isExpandedCreateTimeout) {
                 OutlinedTextField(
                     value = timeoutComment,
@@ -291,40 +306,129 @@ fun PetScreen(
                         .align(Alignment.CenterHorizontally)
                 )
 
-
-                OutlinedTextField(
-                    value = elapsed,
-                    onValueChange = { elapsed = it },
-                    label = { Text("Время срабатывания (в секундах)") },
-                    textStyle = TextStyle(fontSize = 25.sp),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedLabelColor = Color.DarkGray,
-                        unfocusedLabelColor = Color.DarkGray,
-                        cursorColor = Color.Black,
-                        focusedBorderColor = Color.DarkGray,
-                        backgroundColor = Color.White,
-                        unfocusedBorderColor = Color.DarkGray,
-                        textColor = Color.DarkGray
-                    ),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            createTimeout(context, token, groupId, timeoutComment, petId, elapsed)
-                            isExpandedCreateTimeout = false
-                            focusManager.clearFocus()
-                            elapsed = ""
-                        }
-                    ),
+                Row(
                     modifier = Modifier
-                        .padding(vertical = 10.dp)
+                        .fillMaxHeight(0.4f)
                         .fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = elapsed,
+                        onValueChange = { elapsed = it },
+                        label = { Text("Время") },
+                        textStyle = TextStyle(fontSize = 25.sp),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedLabelColor = Color.DarkGray,
+                            unfocusedLabelColor = Color.DarkGray,
+                            cursorColor = Color.Black,
+                            focusedBorderColor = Color.DarkGray,
+                            backgroundColor = Color.White,
+                            unfocusedBorderColor = Color.DarkGray,
+                            textColor = Color.DarkGray
+                        ),
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth(0.3f)
+                            .fillMaxHeight()
+                    )
+                    Spacer(modifier = Modifier.padding(horizontal = 10.dp))
+                    Button(onClick = {
+                        isExpandedTimeoutUnits = !isExpandedTimeoutUnits
+                    },
+                        shape = RoundedCornerShape(15.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = Color.White
+                        )) {
+                        Text(
+                            text = "Единицы времени: $timeUnitString",
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                            color = Color.DarkGray)
+                        )
+                        DropdownMenu(
+                            expanded = isExpandedTimeoutUnits,
+                            onDismissRequest = { isExpandedTimeoutUnits = false },
+                            modifier = Modifier
+                                .background(color = Color.White)
+                        ) {
+                            Text(
+                                text = "Секунды",
+                                style = TextStyle(
+                                    fontSize = 20.sp,
+                                    color = Color.DarkGray
+                                ),
+                                modifier = Modifier
+                                    .clickable(onClick = {
+                                        timeUnitInt = 1
+                                        timeUnitString = "Секунды"
+                                        isExpandedTimeoutUnits = false
+                                    })
+                            )
+                            Text(
+                                text = "Минуты",
+                                style = TextStyle(
+                                    fontSize = 20.sp,
+                                    color = Color.DarkGray
+                                ),
+                                modifier = Modifier
+                                    .clickable(onClick = {
+                                        timeUnitInt = 60
+                                        timeUnitString = "Минуты"
+                                        isExpandedTimeoutUnits = false
+                                    })
+                            )
+                            Text(
+                                text = "Часы",
+                                style = TextStyle(
+                                    fontSize = 20.sp,
+                                    color = Color.DarkGray
+                                ),
+                                modifier = Modifier
+                                    .clickable(onClick = {
+                                        timeUnitInt = 3600
+                                        timeUnitString = "Часы"
+                                        isExpandedTimeoutUnits = false
+                                    })
+                            )
+                        }
+                    }
+                }
+                Button(
+                    onClick = {
+                        createTimeout(
+                            context,
+                            token,
+                            groupId,
+                            timeoutComment,
+                            petId,
+                            elapsed,
+                            timeUnitInt
+                        )
+                        isExpandedCreateTimeout = false
+                        isExpandedCreateNotification = false
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
                         .align(Alignment.CenterHorizontally)
-                )
+                        .padding(vertical = 30.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color.Gray
+                    ),
+                ) {
+                    Text(
+                        text = "Добавить",
+                        style = TextStyle(color = Color.DarkGray, fontSize = 20.sp)
+                    )
+                }
             }
-            //var scheduleComment by rememberSaveable { mutableStateOf("") }
+            //var scheduleComment by rememberSavable { mutableStateOf("") }
             if (isExpandedCreateSchedule) {
-
+                // TODO сделать уведомления по расписанию
             }
         }
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
@@ -436,6 +540,27 @@ fun getPetNotificationsByPetId(
             headers["Authorization"] = token
             return headers
         }
+        override fun parseNetworkResponse(
+            response: NetworkResponse
+        ): Response<String> {
+            var parsed: String
+
+            val encoding = charset(
+                HttpHeaderParser.parseCharset(response.headers))
+
+            try {
+                parsed = String(response.data, encoding)
+                val bytes = parsed.toByteArray(encoding)
+                parsed = String(bytes, Charset.forName("UTF-8"))
+
+                return Response.success(
+                    parsed,
+                    HttpHeaderParser.parseCacheHeaders(response)
+                )
+            } catch (e: UnsupportedEncodingException) {
+                return Response.error(ParseError(e))
+            }
+        }
     }
     queue.add(stringRequest)
 }
@@ -477,11 +602,13 @@ fun createTimeout(
     groupId: String,
     comment: String,
     petId: String,
-    elapsed: String
+    elapsed: String,
+    timeUnit: Int
 ) {
     val splitedComment = comment.replace(" ", "%20")
+    val newElapsed = elapsed.toInt() * timeUnit
     val url = "http://localhost:8091/notifications/timeout/?" +
-            "groupId=$groupId&comment=$splitedComment&petId=$petId&elapsed=$elapsed"
+            "groupId=$groupId&comment=$splitedComment&petId=$petId&elapsed=$newElapsed"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.POST,

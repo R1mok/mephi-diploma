@@ -28,12 +28,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.android.volley.NetworkResponse
+import com.android.volley.ParseError
+import com.android.volley.Response
+import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
 import com.example.petschedule.entities.Group
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.UnsupportedEncodingException
+import java.nio.charset.Charset
 
 
 @Preview
@@ -209,6 +215,27 @@ private fun getGroups(
             val headers = HashMap<String, String>()
             headers["Authorization"] = token
             return headers
+        }
+        override fun parseNetworkResponse(
+            response: NetworkResponse
+        ): Response<String> {
+            var parsed: String
+
+            val encoding = charset(
+                HttpHeaderParser.parseCharset(response.headers))
+
+            try {
+                parsed = String(response.data, encoding)
+                val bytes = parsed.toByteArray(encoding)
+                parsed = String(bytes, Charset.forName("UTF-8"))
+
+                return Response.success(
+                    parsed,
+                    HttpHeaderParser.parseCacheHeaders(response)
+                )
+            } catch (e: UnsupportedEncodingException) {
+                return Response.error(ParseError(e))
+            }
         }
     }
     queue.add(stringRequest)

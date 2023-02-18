@@ -18,4 +18,5 @@ sealed class Screen(val route : String) {
     object UserAccount : Screen("user_account")
     object GroupScreen : Screen("specific_group")
     object PetScreen : Screen("pet_screen")
+    object PetHealth: Screen("chart_screen")
 }
