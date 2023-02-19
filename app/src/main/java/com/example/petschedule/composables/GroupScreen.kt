@@ -38,7 +38,6 @@ import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.petschedule.R
-import com.example.petschedule.entities.Group
 import com.example.petschedule.entities.Pet
 import org.json.JSONArray
 import org.json.JSONObject
@@ -369,7 +368,7 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        getUserByLogin(token, userLogin, requestedUserId, context)
+                        getUserByLogin(token, userLogin, requestedUserId, context, groupId)
                         isExpandedAddPerson = false
                         focusManager.clearFocus()
                         userLogin = ""
@@ -483,7 +482,8 @@ fun getUserByLogin(
     token: String,
     userLogin: String,
     userId: MutableState<String>,
-    context: Context
+    context: Context,
+    groupId: String
 ) {
     val url = "http://localhost:8091/user/getUserByLogin/${userLogin}"
     val queue = Volley.newRequestQueue(context)
@@ -492,9 +492,36 @@ fun getUserByLogin(
         url,
         {
             response ->
-            val obj = JSONObject(response)
-            userId.value = obj.getString("userId")
+            userId.value = response
             Log.d("MyLog", "UserId for login $userLogin is ${userId.value}")
+            inviteToGroup(token, userId.value, context, groupId)
+        },
+        { error ->
+            Log.d("MyLog", "Error $error")
+        }) {
+        override fun getHeaders(): MutableMap<String, String> {
+            val headers = HashMap<String, String>()
+            headers["Authorization"] = token
+            return headers
+        }
+    }
+    queue.add(stringRequest)
+}
+fun inviteToGroup(
+    token: String,
+    userId: String,
+    context: Context,
+    groupId: String
+) {
+    val url = "http://localhost:8091/groups/$groupId/members/$userId"
+    val queue = Volley.newRequestQueue(context)
+    val stringRequest = object : StringRequest(
+        Method.POST,
+        url,
+        { response ->
+            val obj = JSONObject(response)
+            val status = obj.getString("status")
+            Log.d("MyLog", "Status of inviting userId:$userId in groupId:$groupId is $status")
         },
         { error ->
             Log.d("MyLog", "Error $error")
