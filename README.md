@@ -36,3 +36,9 @@
 * Расходы на создание клиентской части и размещение серверной части приложения.
 * Мобильное приложение позволит пользователям упростить работу по уходу за животными.
 * Приложение способно на расширение функционала.
+
+
+# Запуск приложения на сервере через podman
+Создаётся сеть, куда помещаются 2 контейнера (бд + приложение). Сеть имеет ip 10.89.0.1.
+Запуск контейнера с бд: podman run -d --name db --network main_network -e POSTGRES_USER=postgres -e POSTGRES_DB=mydb -e POSTGRES_PASSWORD=admin -v "db-data:/var/lib/postgresql/data" -p 5433:5432 postgres
+Запуск контейнера с приложением: podman run -d --name app --network=main_network -e SPRING_DATASOURCE_URL=jdbc:postgresql://10.89.0.1:5433/mydb -e PORT=8004 -p 8004:8080 docker.io/r1mok/pet-manager:v5
