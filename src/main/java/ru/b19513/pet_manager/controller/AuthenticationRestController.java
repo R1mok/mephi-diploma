@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/shelter/auth")
 @Tag(name = "Authentication controller", description = "Контроллер аутентификации")
 public class AuthenticationRestController {
     private final AuthenticationManager authenticationManager;

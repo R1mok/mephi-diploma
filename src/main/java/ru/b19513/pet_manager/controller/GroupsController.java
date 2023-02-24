@@ -15,7 +15,7 @@ import ru.b19513.pet_manager.service.GroupService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/groups")
+@RequestMapping("/shelter/groups")
 @Tag(name = "Groups controller", description = "Контроллер групп")
 public class GroupsController {
 

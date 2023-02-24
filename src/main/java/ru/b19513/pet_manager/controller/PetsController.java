@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pets")
+@RequestMapping("/shelter/pets")
 @Tag(name = "Pets controller", description = "Контроллер питомцев")
 public class PetsController {
 

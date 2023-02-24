@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/shelter/user")
 @Tag(name = "Users controller", description = "Контроллер пользователей")
 public class    UsersController {
 

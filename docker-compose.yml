@@ -11,7 +11,7 @@ services:
     volumes:
       - "db-data:/var/lib/postgresql/data"
   app:
-    image: r1mok/pet-schedule
+    image: r1mok/pet-manager:v8
     environment:
       - PORT=8080
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres/mydb

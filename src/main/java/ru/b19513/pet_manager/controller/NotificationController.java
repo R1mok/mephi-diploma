@@ -18,7 +18,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping("/shelter/notifications")
 @Tag(name = "Notifications controller", description = "Контроллер уведомлений")
 
 public class NotificationController {
