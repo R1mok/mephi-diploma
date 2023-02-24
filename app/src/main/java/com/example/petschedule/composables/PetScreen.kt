@@ -480,7 +480,7 @@ fun getPetById(
     petBornDate: MutableState<String>,
     context: Context
 ) {
-    val url = "http://localhost:8091/pets/${petId}"
+    val url = "https://psp.mephi.ru/shelter/pets/${petId}"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.GET,
@@ -510,7 +510,7 @@ fun getPetNotificationsByPetId(
     petId: String,
     context: Context
 ) {
-    val url = "http://localhost:8091/pets/$petId/feedNotes"
+    val url = "https://psp.mephi.ru/shelter/pets/$petId/feedNotes"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.GET,
@@ -572,7 +572,7 @@ fun createFeedNote(
     context: Context,
     comment: String,
 ) {
-    val url = "http://localhost:8091/pets/createFeedNote?" +
+    val url = "https://psp.mephi.ru/shelter/pets/createFeedNote?" +
             "petId=$petId&comment=$comment"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
@@ -607,7 +607,7 @@ fun createTimeout(
 ) {
     val splitedComment = comment.replace(" ", "%20")
     val newElapsed = elapsed.toInt() * timeUnit
-    val url = "http://localhost:8091/notifications/timeout/?" +
+    val url = "https://psp.mephi.ru/shelter/notifications/timeout/?" +
             "groupId=$groupId&comment=$splitedComment&petId=$petId&elapsed=$newElapsed"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(

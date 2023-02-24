@@ -170,7 +170,7 @@ private fun register(
     context: Context,
     navController: NavController
 ) {
-    val url = "http://localhost:8091/user/register"
+    val url = "https://psp.mephi.ru/shelter/user/register"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.POST,

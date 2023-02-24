@@ -187,7 +187,7 @@ private fun getGroups(
     context: Context,
     groups: MutableState<MutableList<Group>>
 ) {
-    val url = "http://localhost:8091/groups/"
+    val url = "https://psp.mephi.ru/shelter/groups/"
     val newGroup = mutableListOf<Group>()
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
@@ -247,7 +247,7 @@ fun createGroup(
     context: Context,
     groups: MutableState<MutableList<Group>>
 ) {
-    val url = "http://localhost:8091/groups/create" +
+    val url = "https://psp.mephi.ru/shelter/groups/create" +
             "?name=$name"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(

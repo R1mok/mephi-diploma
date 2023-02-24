@@ -443,7 +443,7 @@ fun createPet(
     petGender: String,
     bornDate: MutableState<String>
 ) {
-    val url = "http://localhost:8091/pets/createPet?" +
+    val url = "https://psp.mephi.ru/shelter/pets/createPet?" +
             "groupId=$id" +
             "&name=$name" +
             "&gender=${petGender.uppercase()}" +
@@ -485,7 +485,7 @@ fun getUserByLogin(
     context: Context,
     groupId: String
 ) {
-    val url = "http://localhost:8091/user/getUserByLogin/${userLogin}"
+    val url = "https://psp.mephi.ru/shelter/user/getUserByLogin/${userLogin}"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.GET,
@@ -513,7 +513,7 @@ fun inviteToGroup(
     context: Context,
     groupId: String
 ) {
-    val url = "http://localhost:8091/groups/$groupId/members/$userId"
+    val url = "https://psp.mephi.ru/shelter/groups/$groupId/members/$userId"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.POST,
@@ -540,7 +540,7 @@ fun getPetsFromGroup(
     pets: MutableState<MutableList<Pet>>,
     context: Context
 ) {
-    val url = "http://localhost:8091/pets/byGroup/$id"
+    val url = "https://psp.mephi.ru/shelter/pets/byGroup/$id"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.GET,

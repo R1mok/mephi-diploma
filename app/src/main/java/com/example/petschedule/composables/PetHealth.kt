@@ -515,7 +515,7 @@ fun addPetParameters(
     petParametersList: MutableState<MutableList<PetParameters>>
 ) {
 
-    val url = "http://localhost:8091/pets/parameters/add/$petId?" +
+    val url = "https://psp.mephi.ru/shelter/pets/parameters/add/$petId?" +
             "weight=${newWeight.toDouble()}&height=${newHeight.toDouble()}&date=${mDate.value}"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
@@ -558,7 +558,7 @@ fun getPetParameters(
     petId: String,
     petParametersList: MutableState<MutableList<PetParameters>>
 ) {
-    val url = "http://localhost:8091/pets/parameters/get/$petId"
+    val url = "https://psp.mephi.ru/shelter/pets/parameters/get/$petId"
     val queue = Volley.newRequestQueue(context)
     var newPetParametersList = mutableListOf<PetParameters>()
     val stringRequest = object : StringRequest(

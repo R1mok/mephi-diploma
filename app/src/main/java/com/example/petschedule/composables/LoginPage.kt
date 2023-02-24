@@ -181,7 +181,7 @@ fun authLogin(
     context: Context,
     navController: NavController
 ) {
-    val url = "http://localhost:8091/auth/login"
+    val url = "https://psp.mephi.ru/shelter/auth/login"
 
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
