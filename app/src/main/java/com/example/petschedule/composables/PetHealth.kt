@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.petschedule.MainActivity
 import org.json.JSONArray
 import org.json.JSONObject
 import java.math.RoundingMode
@@ -515,7 +516,7 @@ fun addPetParameters(
     petParametersList: MutableState<MutableList<PetParameters>>
 ) {
 
-    val url = "https://psp.mephi.ru/shelter/pets/parameters/add/$petId?" +
+    val url = MainActivity.prefixUrl + "/pets/parameters/add/$petId?" +
             "weight=${newWeight.toDouble()}&height=${newHeight.toDouble()}&date=${mDate.value}"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
@@ -558,7 +559,7 @@ fun getPetParameters(
     petId: String,
     petParametersList: MutableState<MutableList<PetParameters>>
 ) {
-    val url = "https://psp.mephi.ru/shelter/pets/parameters/get/$petId"
+    val url = MainActivity.prefixUrl + "/pets/parameters/get/$petId"
     val queue = Volley.newRequestQueue(context)
     var newPetParametersList = mutableListOf<PetParameters>()
     val stringRequest = object : StringRequest(

@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.petschedule.MainActivity
 import com.example.petschedule.R
 import com.example.petschedule.entities.User
 
@@ -170,7 +171,7 @@ private fun register(
     context: Context,
     navController: NavController
 ) {
-    val url = "https://psp.mephi.ru/shelter/user/register"
+    val url = MainActivity.prefixUrl + "/user/register"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.POST,

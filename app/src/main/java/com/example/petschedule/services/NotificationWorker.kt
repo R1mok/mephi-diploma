@@ -47,7 +47,7 @@ class NotificationWorker(
         }
     }
     private fun deleteReceivedNotification(context: Context, id: String, token: String) {
-        val url = "http://localhost:8091/notifications/$id"
+        val url = MainActivity.prefixUrl + "/notifications/$id"
         val queue = Volley.newRequestQueue(context)
         val stringRequest = object : StringRequest(
             Method.DELETE,
@@ -67,7 +67,7 @@ class NotificationWorker(
         queue.add(stringRequest)
     }
     private fun showNotifications(context: Context, token: String) {
-        val url = "http://localhost:8091/notifications/show"
+        val url = MainActivity.prefixUrl + "/notifications/show"
         val queue = Volley.newRequestQueue(context)
         val stringRequest = object : StringRequest(
             Method.GET,

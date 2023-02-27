@@ -34,6 +34,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.petschedule.MainActivity
 import com.example.petschedule.R
 import com.example.petschedule.entities.Group
 import org.json.JSONArray
@@ -187,7 +188,7 @@ private fun getGroups(
     context: Context,
     groups: MutableState<MutableList<Group>>
 ) {
-    val url = "https://psp.mephi.ru/shelter/groups/"
+    val url = MainActivity.prefixUrl + "/groups/"
     val newGroup = mutableListOf<Group>()
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
@@ -247,7 +248,7 @@ fun createGroup(
     context: Context,
     groups: MutableState<MutableList<Group>>
 ) {
-    val url = "https://psp.mephi.ru/shelter/groups/create" +
+    val url = MainActivity.prefixUrl + "/groups/create" +
             "?name=$name"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(

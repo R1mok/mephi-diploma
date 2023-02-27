@@ -37,6 +37,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.petschedule.MainActivity
 import com.example.petschedule.R
 import com.example.petschedule.entities.FeedNote
 import org.json.JSONArray
@@ -480,7 +481,7 @@ fun getPetById(
     petBornDate: MutableState<String>,
     context: Context
 ) {
-    val url = "https://psp.mephi.ru/shelter/pets/${petId}"
+    val url = MainActivity.prefixUrl + "/pets/${petId}"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.GET,
@@ -510,7 +511,7 @@ fun getPetNotificationsByPetId(
     petId: String,
     context: Context
 ) {
-    val url = "https://psp.mephi.ru/shelter/pets/$petId/feedNotes"
+    val url = MainActivity.prefixUrl + "/pets/$petId/feedNotes"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.GET,
@@ -572,7 +573,7 @@ fun createFeedNote(
     context: Context,
     comment: String,
 ) {
-    val url = "https://psp.mephi.ru/shelter/pets/createFeedNote?" +
+    val url = MainActivity.prefixUrl + "/pets/createFeedNote?" +
             "petId=$petId&comment=$comment"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
@@ -607,7 +608,7 @@ fun createTimeout(
 ) {
     val splitedComment = comment.replace(" ", "%20")
     val newElapsed = elapsed.toInt() * timeUnit
-    val url = "https://psp.mephi.ru/shelter/notifications/timeout/?" +
+    val url = MainActivity.prefixUrl + "/notifications/timeout/?" +
             "groupId=$groupId&comment=$splitedComment&petId=$petId&elapsed=$newElapsed"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(

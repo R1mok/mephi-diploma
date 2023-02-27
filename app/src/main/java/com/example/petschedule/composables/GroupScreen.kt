@@ -37,6 +37,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.petschedule.MainActivity
 import com.example.petschedule.R
 import com.example.petschedule.entities.Pet
 import org.json.JSONArray
@@ -443,7 +444,7 @@ fun createPet(
     petGender: String,
     bornDate: MutableState<String>
 ) {
-    val url = "https://psp.mephi.ru/shelter/pets/createPet?" +
+    val url = MainActivity.prefixUrl + "/pets/createPet?" +
             "groupId=$id" +
             "&name=$name" +
             "&gender=${petGender.uppercase()}" +
@@ -485,7 +486,7 @@ fun getUserByLogin(
     context: Context,
     groupId: String
 ) {
-    val url = "https://psp.mephi.ru/shelter/user/getUserByLogin/${userLogin}"
+    val url = MainActivity.prefixUrl + "/user/getUserByLogin/${userLogin}"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.GET,
@@ -513,7 +514,7 @@ fun inviteToGroup(
     context: Context,
     groupId: String
 ) {
-    val url = "https://psp.mephi.ru/shelter/groups/$groupId/members/$userId"
+    val url = MainActivity.prefixUrl + "/groups/$groupId/members/$userId"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.POST,
@@ -540,7 +541,7 @@ fun getPetsFromGroup(
     pets: MutableState<MutableList<Pet>>,
     context: Context
 ) {
-    val url = "https://psp.mephi.ru/shelter/pets/byGroup/$id"
+    val url = MainActivity.prefixUrl + "/pets/byGroup/$id"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.GET,

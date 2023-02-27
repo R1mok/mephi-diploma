@@ -21,6 +21,8 @@ class MainActivity : ComponentActivity() {
     }
     companion object {
         var TOKEN = ""
+        var prefixUrl = "http://localhost:8091/shelter"
+        // serverPrefix: https://psp.mephi.ru/shelter
 
         private var instance: MainActivity? = null
 
