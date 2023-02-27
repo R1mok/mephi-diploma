@@ -88,7 +88,7 @@ class UserServiceImplTest {
         groupService.createGroup(groupOwner, "group");
         var group = groupRepository.findAll().get(0);
         groupService.inviteUser(groupOwner, group.getId(), user.getId());
-        userService.acceptInvitation(user, group.getId());
+        userService.acceptInvitation(user.getId(), group.getId());
         Assertions.assertEquals(Set.of(groupOwner, user), groupRepository.findAll().get(0).getUsers());
         userRepository.deleteAll();
         groupRepository.deleteAll();

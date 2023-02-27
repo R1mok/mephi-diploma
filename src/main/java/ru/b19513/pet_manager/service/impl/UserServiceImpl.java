@@ -85,10 +85,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GroupDTO acceptInvitation(User user, long groupId) {
+    public GroupDTO acceptInvitation(long userId, long groupId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow();
         var invitation = invitationRepository.findById(new Invitation.Key(user.getId(), groupId))
                 .orElseThrow(new NotFoundException("Invitation with user id: " + user.getId() + " and group id: " + groupId + "not found"));
-        var group = invitation.getGroup();
+        var group = groupRepository.findById(groupId).orElseThrow(new NotFoundException("group with id " + groupId + " not found"));
         if (user.getGroups() == null){
             user.setGroups(new HashSet<>());
         }

@@ -16,7 +16,7 @@ public interface UserService{
 
     Collection<InvitationDTO> getInvitation(User user);
 
-    GroupDTO acceptInvitation(User user, long groupId);
+    GroupDTO acceptInvitation(long userId, long groupId);
 
     StatusDTO isLoginFree(String login);
 

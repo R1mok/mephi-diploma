@@ -52,9 +52,9 @@ public class    UsersController {
     }
 
     @Operation(summary = "Принять приглашение")
-    @PutMapping("/accept")
-    public ResponseEntity<GroupDTO> acceptInvitation(Authentication auth, @RequestParam long groupId) {
-        GroupDTO groupDTO = userService.acceptInvitation((User) auth.getPrincipal(), groupId);
+    @PutMapping("/accept/{groupId}")
+    public ResponseEntity<GroupDTO> acceptInvitation(Authentication auth, @PathVariable long groupId) {
+        GroupDTO groupDTO = userService.acceptInvitation(((User) auth.getPrincipal()).getId(), groupId);
         return ResponseEntity.ok(groupDTO);
     }
 
