@@ -40,6 +40,7 @@ import com.android.volley.toolbox.Volley
 import com.example.petschedule.MainActivity
 import com.example.petschedule.R
 import com.example.petschedule.entities.Pet
+import com.example.petschedule.entities.User
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -77,12 +78,18 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
     var pets = remember {
         mutableStateOf(mutableListOf<Pet>())
     }
+    var members = remember {
+        mutableStateOf(mutableListOf<User>())
+    }
     getPetsFromGroup(token, groupId, pets, context)
 
     var isExpandedCreatePet by remember {
         mutableStateOf(false)
     }
     var isExpandedAddPerson by remember {
+        mutableStateOf(false)
+    }
+    var groupMembersList by remember {
         mutableStateOf(false)
     }
     var isExpandedPetGender by remember {
@@ -107,7 +114,7 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
     // Declaring a string value to
     // store date in string format
     val mDate = rememberSaveable { mutableStateOf("") }
-
+    getGroupMembersList(context, groupId, token, members)
     val mDatePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
@@ -309,6 +316,10 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
                 onClick = {
                     createPet(pets, context, token, groupId, petName, petType, petGender, mDate)
                     isExpandedCreatePet = false
+                    petName = ""
+                    petType = ""
+                    petGender = ""
+                    mDate.value = ""
                 },
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
@@ -380,6 +391,53 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)
             )
+        }
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .align(Alignment.CenterHorizontally)
+                .padding(vertical = 20.dp),
+            onClick = {
+                groupMembersList = !groupMembersList
+            },
+            shape = RoundedCornerShape(15.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.White
+            )
+        ) {
+            Text(
+                text = "Посмотреть список участников",
+                style = TextStyle(fontSize = 23.sp, color = Color.DarkGray)
+            )
+        }
+        if (groupMembersList) {
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 40.dp)
+            ) {
+                items(members.value) { member ->
+                    Button(
+                        onClick = {
+                        },
+                        shape = RoundedCornerShape(15.dp),
+                        modifier = Modifier.padding(5.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = Color.Gray
+                        )
+                    ) {
+                        Text(
+                            text = member.login,
+                            color = Color.DarkGray,
+                            fontSize = 30.sp
+                        )
+                    }
+                }
+            }
         }
 
         Text(
@@ -479,6 +537,7 @@ fun createPet(
     }
     queue.add(stringRequest)
 }
+
 fun getUserByLogin(
     token: String,
     userLogin: String,
@@ -491,8 +550,7 @@ fun getUserByLogin(
     val stringRequest = object : StringRequest(
         Method.GET,
         url,
-        {
-            response ->
+        { response ->
             userId.value = response
             Log.d("MyLog", "UserId for login $userLogin is ${userId.value}")
             inviteToGroup(token, userId.value, context, groupId)
@@ -508,6 +566,7 @@ fun getUserByLogin(
     }
     queue.add(stringRequest)
 }
+
 fun inviteToGroup(
     token: String,
     userId: String,
@@ -535,6 +594,7 @@ fun inviteToGroup(
     }
     queue.add(stringRequest)
 }
+
 fun getPetsFromGroup(
     token: String,
     id: String,
@@ -577,11 +637,72 @@ fun getPetsFromGroup(
         }
 
         override fun parseNetworkResponse(
-            response: NetworkResponse): Response<String> {
+            response: NetworkResponse
+        ): Response<String> {
             var parsed: String
 
             val encoding = charset(
-                HttpHeaderParser.parseCharset(response.headers))
+                HttpHeaderParser.parseCharset(response.headers)
+            )
+
+            try {
+                parsed = String(response.data, encoding)
+                val bytes = parsed.toByteArray(encoding)
+                parsed = String(bytes, Charset.forName("UTF-8"))
+
+                return Response.success(
+                    parsed,
+                    HttpHeaderParser.parseCacheHeaders(response)
+                )
+            } catch (e: UnsupportedEncodingException) {
+                return Response.error(ParseError(e))
+            }
+        }
+    }
+    queue.add(stringRequest)
+}
+
+fun getGroupMembersList(
+    context: Context,
+    groupId: String,
+    token: String,
+    members: MutableState<MutableList<User>>,
+) {
+    val url = MainActivity.prefixUrl + "/groups/membersList/$groupId"
+    val queue = Volley.newRequestQueue(context)
+    val stringRequest = object : StringRequest(
+        Method.GET,
+        url,
+        { response ->
+            val obj = JSONArray(response)
+            Log.d("MyLog", "obj length = ${obj.length()}")
+            val membersList = mutableListOf<User>()
+            for (i in 0 until obj.length()) {
+                Log.d("MyLog", "i = $i, value = ${obj.getString(i)}")
+                val jsonUser = JSONObject(obj.getString(i))
+                membersList.add(
+                    User(jsonUser.getString("id"), jsonUser.getString("login"), "", "", "")
+                )
+            }
+            members.value = membersList
+        },
+        { error ->
+            Log.d("MyLog", "Error $error")
+        }) {
+        override fun getHeaders(): MutableMap<String, String> {
+            val headers = HashMap<String, String>()
+            headers["Authorization"] = token
+            return headers
+        }
+
+        override fun parseNetworkResponse(
+            response: NetworkResponse
+        ): Response<String> {
+            var parsed: String
+
+            val encoding = charset(
+                HttpHeaderParser.parseCharset(response.headers)
+            )
 
             try {
                 parsed = String(response.data, encoding)

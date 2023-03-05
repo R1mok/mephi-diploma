@@ -62,7 +62,7 @@ fun LoginPage(navController: NavController) {
         mutableStateOf("")
     }
     val user = remember {
-        mutableStateOf(User(login, password, "", token))
+        mutableStateOf(User("", login, password, "", token))
     }
     val context = LocalContext.current
     Column(

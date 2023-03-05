@@ -54,7 +54,7 @@ fun RegPage(navController: NavController) {
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     val user = remember {
-        mutableStateOf(User(login, password, name, ""))
+        mutableStateOf(User("", login, password, name, ""))
     }
     val context = LocalContext.current
     Column(
