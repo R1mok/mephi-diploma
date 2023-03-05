@@ -114,7 +114,7 @@ public class PetServiceImpl implements PetService {
 
     @Override
     public FeedNoteDTO createFeedNote(long petId, long userId, String comment) {
-        var pet = petRepository.findById(petId).orElseThrow(new NotFoundException("Pet with pet id " + petId + " not found"));
+            var pet = petRepository.findById(petId).orElseThrow(new NotFoundException("Pet with pet id " + petId + " not found"));
         var user = userRepository.findById(userId).orElseThrow(new NotFoundException("User with user id " + userId + " not found"));
         var newFeedNote = FeedNote.builder()
                 .pet(pet)

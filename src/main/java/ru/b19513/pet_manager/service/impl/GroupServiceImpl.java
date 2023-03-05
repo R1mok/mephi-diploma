@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.b19513.pet_manager.controller.entity.GroupDTO;
 import ru.b19513.pet_manager.controller.entity.StatusDTO;
+import ru.b19513.pet_manager.controller.entity.UserDTO;
 import ru.b19513.pet_manager.exceptions.NotFoundException;
 import ru.b19513.pet_manager.exceptions.NotPermittedException;
 import ru.b19513.pet_manager.repository.GroupRepository;
@@ -15,11 +16,9 @@ import ru.b19513.pet_manager.repository.entity.Invitation;
 import ru.b19513.pet_manager.repository.entity.User;
 import ru.b19513.pet_manager.service.GroupService;
 import ru.b19513.pet_manager.service.mapper.GroupMapper;
+import ru.b19513.pet_manager.service.mapper.UserMapper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.b19513.pet_manager.consts.Consts.*;
@@ -31,14 +30,16 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final InvitationRepository invitationRepository;
+    private final UserMapper userMapper;
 
     @Autowired
     public GroupServiceImpl(GroupMapper groupMapper, GroupRepository groupRepository, UserRepository userRepository,
-                            InvitationRepository invitationRepository) {
+                            InvitationRepository invitationRepository, UserMapper userMapper) {
         this.groupMapper = groupMapper;
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
         this.invitationRepository = invitationRepository;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -121,5 +122,14 @@ public class GroupServiceImpl implements GroupService {
                 .status(HttpStatus.OK)
                 .description(GROUP_DELETED)
                 .build();
+    }
+
+    @Override
+    public Collection<UserDTO> getMembersList(long groupId) {
+        var group = groupRepository.findById(groupId)
+                .orElseThrow(new NotFoundException("Group with group id " + groupId + " not found"));
+        var sortedSet = group.getUsers().stream().sorted(Comparator.comparingLong(User::getId))
+                .collect(Collectors.toList());
+        return userMapper.entityToDTO(sortedSet);
     }
 }

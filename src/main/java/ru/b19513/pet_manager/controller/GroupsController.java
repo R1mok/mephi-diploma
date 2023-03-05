@@ -8,10 +8,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.b19513.pet_manager.controller.entity.GroupDTO;
 import ru.b19513.pet_manager.controller.entity.StatusDTO;
+import ru.b19513.pet_manager.controller.entity.UserDTO;
 import ru.b19513.pet_manager.repository.entity.Group;
 import ru.b19513.pet_manager.repository.entity.User;
 import ru.b19513.pet_manager.service.GroupService;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -66,5 +68,12 @@ public class GroupsController {
     public ResponseEntity<StatusDTO> delete(Authentication auth, @RequestParam long groupId) {
         StatusDTO statusDTO = groupService.deleteGroup(groupId, (User) auth.getPrincipal());
         return ResponseEntity.ok(statusDTO);
+    }
+
+    @Operation(summary = "Получение всех пользователей в группе")
+    @GetMapping("/membersList/{groupId}")
+    public ResponseEntity<Collection<UserDTO>> getMembersList(@PathVariable long groupId) {
+        Collection<UserDTO> users = groupService.getMembersList(groupId);
+        return ResponseEntity.ok(users);
     }
 }
