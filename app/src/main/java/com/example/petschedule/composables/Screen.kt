@@ -15,6 +15,7 @@ sealed class Screen(val route : String) {
             }
         }
     }
+    object WalkingSchedule: Screen("walking_schedule")
     object UserAccount : Screen("user_account")
     object GroupScreen : Screen("specific_group")
     object PetScreen : Screen("pet_screen")

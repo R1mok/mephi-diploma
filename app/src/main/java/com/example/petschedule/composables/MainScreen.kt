@@ -72,7 +72,7 @@ fun MainScreen(navController: NavController, token: String) {
 
             ) {
             Text(
-                text = "Информация об аккаунте",
+                text = "Управление аккаунтом",
                 style = TextStyle(fontSize = 25.sp, color = Color.DarkGray)
             )
         }

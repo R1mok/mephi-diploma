@@ -76,6 +76,7 @@ fun UserAccount(navController: NavController, token : String) {
             .padding(horizontal = 10.dp)
             .fillMaxWidth()
     ) {
+
         Text(
             text = "Список приглашений в группы",
             style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),

@@ -1,7 +1,9 @@
 package com.example.petschedule
 
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.petschedule.composables.*
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
@@ -44,6 +47,19 @@ fun Navigation() {
             MainScreen(navController = navController, token)
             BackHandler(true) {
             }
+        }
+        composable(
+            route = Screen.WalkingSchedule.route + "/{token}",
+            arguments = listOf(
+                navArgument("token") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                    nullable = false
+                }
+            ),
+        ) { entry ->
+            val token = entry.arguments?.getString("token").toString()
+            WalkingSchedule(navController = navController, token)
         }
         composable(route = Screen.LoginPage.route) {
             LoginPage(navController = navController)

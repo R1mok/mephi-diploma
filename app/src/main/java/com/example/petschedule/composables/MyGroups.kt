@@ -13,7 +13,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
@@ -62,8 +61,6 @@ fun MyGroupsPreview() {
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun MyGroups(navController: NavController, token: String) {
-    if (false)
-        navController.navigate(Screen.MyGroups.route)
     val context = LocalContext.current
     var isCreateGroup by remember {
         mutableStateOf(false)
@@ -133,6 +130,28 @@ fun MyGroups(navController: NavController, token: String) {
                 )
             }
         }
+        Spacer(modifier = Modifier.padding(vertical = 20.dp))
+        Button(
+            onClick = {
+                navController.navigate(Screen.WalkingSchedule.withArgs(token))
+            },
+            shape = RoundedCornerShape(15.dp),
+            modifier = Modifier
+                .padding(horizontal = 5.dp)
+                .fillMaxWidth(0.9f)
+                .align(Alignment.CenterHorizontally),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.White,
+                contentColor = Color.Gray
+            )
+        ) {
+            Text(
+                text = "Расписание выгулов",
+                color = Color.DarkGray,
+                fontSize = 25.sp,
+            )
+        }
+        Spacer(modifier = Modifier.padding(vertical = 20.dp))
         Text(
             text = "Список групп:",
             style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
@@ -183,7 +202,7 @@ fun MyGroups(navController: NavController, token: String) {
     }
 }
 
-private fun getGroups(
+fun getGroups(
     token: String,
     context: Context,
     groups: MutableState<MutableList<Group>>
@@ -203,7 +222,8 @@ private fun getGroups(
                 newGroup.add(
                     Group(
                         jsonGroup.get("id").toString(),
-                        jsonGroup.get("name").toString()
+                        jsonGroup.get("name").toString(),
+                        jsonGroup.get("walkingCount").toString(),
                     )
                 )
             }

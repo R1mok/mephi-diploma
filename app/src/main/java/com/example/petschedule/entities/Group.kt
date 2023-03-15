@@ -1,5 +1,5 @@
 package com.example.petschedule.entities
 
-data class Group(val id: String, val name: String) {
+data class Group(val id: String, val name: String, var walkingCount: String) {
 
 }
