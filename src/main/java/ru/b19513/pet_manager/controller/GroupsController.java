@@ -42,6 +42,13 @@ public class GroupsController {
         return ResponseEntity.ok(groupDTO);
     }
 
+    @Operation(summary = "Обновление количества прогулок в группе")
+    @PutMapping("/walking")
+    public ResponseEntity<StatusDTO> updateWalkingCount(@RequestBody List<GroupDTO> groupDtoList) {
+        StatusDTO statusDTO = groupService.updateWalkingCount(groupDtoList);
+        return ResponseEntity.ok(statusDTO);
+    }
+
     @Operation(summary = "Приглашение в группу")
     @PostMapping("/{groupId}/members/{userId}")
     public ResponseEntity<StatusDTO> invite(Authentication auth, @PathVariable long groupId, @PathVariable long userId) {

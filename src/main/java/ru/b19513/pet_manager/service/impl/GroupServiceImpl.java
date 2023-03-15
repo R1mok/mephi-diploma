@@ -21,7 +21,9 @@ import ru.b19513.pet_manager.service.mapper.UserMapper;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.b19513.pet_manager.consts.Consts.*;
+import static ru.b19513.pet_manager.consts.Consts.GROUP_DELETED;
+import static ru.b19513.pet_manager.consts.Consts.INVITATION_SENDED;
+import static ru.b19513.pet_manager.consts.Consts.GROUPS_UPDATED;
 
 @Service
 public class GroupServiceImpl implements GroupService {
@@ -131,5 +133,18 @@ public class GroupServiceImpl implements GroupService {
         var sortedSet = group.getUsers().stream().sorted(Comparator.comparingLong(User::getId))
                 .collect(Collectors.toList());
         return userMapper.entityToDTO(sortedSet);
+    }
+
+    @Override
+    public StatusDTO updateWalkingCount(List<GroupDTO> groupDtoList) {
+        for (GroupDTO elem : groupDtoList) {
+            var group = groupRepository.getById(elem.getId());
+            group.setWalkingCount(elem.getWalkingCount());
+            groupRepository.save(group);
+        }
+        return StatusDTO.builder()
+                .status(HttpStatus.OK)
+                .description(GROUPS_UPDATED)
+                .build();
     }
 }

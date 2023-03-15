@@ -1,6 +1,7 @@
 package ru.b19513.pet_manager.repository.entity;
 
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.util.List;
@@ -45,4 +46,7 @@ public class Group {
     @Column
     @OneToMany
     private List<Notification> notificationList;
+
+    @Column
+    private int walkingCount;
 }

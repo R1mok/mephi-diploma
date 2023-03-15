@@ -23,4 +23,5 @@ public interface GroupService {
     StatusDTO deleteGroup(long groupId, User owner);
 
     Collection<UserDTO> getMembersList(long groupID);
+    StatusDTO updateWalkingCount(List<GroupDTO> groupDtoList);
 }
