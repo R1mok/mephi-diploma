@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "596677477044",
+    "project_id": "r1mokpetmanager",
+    "storage_bucket": "r1mokpetmanager.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596677477044:android:10115b28c8a0efec104de1",
+        "android_client_info": {
+          "package_name": "com.example.petschedule"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596677477044-rbs3uebpq2phnb9aigba4i93i5f7b02n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCljeKlbO_sbzGehIVKPi8V23-aFfVQLAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596677477044-rbs3uebpq2phnb9aigba4i93i5f7b02n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

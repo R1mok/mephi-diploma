@@ -25,7 +25,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.petschedule.MainActivity
 import com.example.petschedule.R
-import com.example.petschedule.services.NotificationWorker
+import com.example.petschedule.services.MyWorker
 import java.util.concurrent.TimeUnit
 
 @Preview
@@ -95,16 +95,6 @@ fun MainScreen(navController: NavController, token: String) {
                 style = TextStyle(fontSize = 25.sp, color = Color.DarkGray)
             )
         }
-        applyNotifications(token)
     }
 }
-@SuppressLint("RestrictedApi")
-fun applyNotifications(token: String) {
-    val data = Data.Builder()
-    data.putString("token", token)
-    val work = PeriodicWorkRequestBuilder<NotificationWorker>(5, TimeUnit.SECONDS)
-        .setInputData(data.build()).build()
-    workManager.enqueue(work)
-}
 
-private val workManager = WorkManager.getInstance(MainActivity.applicationContext())
