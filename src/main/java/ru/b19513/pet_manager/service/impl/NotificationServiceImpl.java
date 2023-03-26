@@ -2,6 +2,7 @@ package ru.b19513.pet_manager.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 import ru.b19513.pet_manager.controller.entity.NotificationDTO;
 import ru.b19513.pet_manager.controller.entity.NotificationScheduleDTO;
@@ -12,6 +13,8 @@ import ru.b19513.pet_manager.exceptions.WrongNotificationClassException;
 import ru.b19513.pet_manager.repository.*;
 import ru.b19513.pet_manager.repository.entity.*;
 import ru.b19513.pet_manager.service.NotificationService;
+import ru.b19513.pet_manager.service.fcm.PushNotificationRequest;
+import ru.b19513.pet_manager.service.fcm.PushNotificationService;
 import ru.b19513.pet_manager.service.mapper.NotificationMapper;
 
 import java.time.*;
@@ -34,9 +37,11 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final UserRepository userRepository;
     private final NotificationMapper notificationMapper;
+    private final ThreadPoolTaskScheduler threadPoolTaskScheduler;
+    private final PushNotificationService pushNotificationService;
 
     @Autowired
-    public NotificationServiceImpl(NotificationNoteRepository notificationNoteRepository, NotificationRepository notificationRepository, GroupRepository groupRepository, PetRepository petRepository, FeedNoteRepository feedNoteRepository, UserRepository userRepository, NotificationMapper notificationMapper) {
+    public NotificationServiceImpl(NotificationNoteRepository notificationNoteRepository, NotificationRepository notificationRepository, GroupRepository groupRepository, PetRepository petRepository, FeedNoteRepository feedNoteRepository, UserRepository userRepository, NotificationMapper notificationMapper, ThreadPoolTaskScheduler threadPoolTaskScheduler, PushNotificationService pushNotificationService) {
 
         this.notificationNoteRepository = notificationNoteRepository;
         this.notificationRepository = notificationRepository;
@@ -45,6 +50,8 @@ public class NotificationServiceImpl implements NotificationService {
         this.feedNoteRepository = feedNoteRepository;
         this.userRepository = userRepository;
         this.notificationMapper = notificationMapper;
+        this.threadPoolTaskScheduler = threadPoolTaskScheduler;
+        this.pushNotificationService = pushNotificationService;
     }
 
     @Override
@@ -60,6 +67,24 @@ public class NotificationServiceImpl implements NotificationService {
                 .comment(comment)
                 .enabled(true)
                 .build();
+        for (User user: group.getUsers()) {
+            String token = "";
+            // Long userId = user.getId()
+            // List<String> tokenList = userDevicesRepository.getTokenListByUserId();
+            // for (String token : tokenList) {
+            threadPoolTaskScheduler.scheduleWithFixedDelay(() -> {
+                PushNotificationRequest request = new PushNotificationRequest(
+                        "Уведомление от группы " + group.getName() + " для питомца " + pet.getName(), comment, "topic");
+                request.setToken(token);
+                pushNotificationService.sendPushNotificationToToken(request);
+            }, elapsed * 1000);
+            //
+        }
+        threadPoolTaskScheduler.scheduleWithFixedDelay(() -> {
+            PushNotificationRequest request = new PushNotificationRequest(
+                    "Уведомление от группы " + group.getName() + " для питомца " + pet.getName(), comment, "topic");
+            pushNotificationService.sendPushNotificationToToken(request);
+        }, elapsed * 1000);
         notificationTimeout.setTime(LocalDateTime.now());
         var notifSet = pet.getNotifications(); // добавляю к питомцу созданное уведомление
         if (notifSet == null) {

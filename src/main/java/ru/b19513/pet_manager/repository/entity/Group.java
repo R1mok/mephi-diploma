@@ -1,6 +1,8 @@
 package ru.b19513.pet_manager.repository.entity;
 
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -47,6 +49,6 @@ public class Group {
     @OneToMany
     private List<Notification> notificationList;
 
-    @Column
+    @ColumnDefault("0")
     private int walkingCount;
 }
