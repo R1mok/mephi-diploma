@@ -1,8 +1,7 @@
 package ru.b19513.pet_manager.service.impl;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,11 +34,12 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final InvitationRepository invitationRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserDevicesRepository userDevicesRepository;
 
     @Autowired
     public UserServiceImpl(GroupRepository groupRepository, UserMapper userMapper, InvitationMapper invitationMapper, GroupMapper groupMapper,
                            EnumMapper enumMapper, UserRepository userRepository, InvitationRepository invitationRepository,
-                           BCryptPasswordEncoder bCryptPasswordEncoder) {
+                           BCryptPasswordEncoder bCryptPasswordEncoder, UserDevicesRepository userDevicesRepository) {
         this.groupRepository = groupRepository;
         this.userMapper = userMapper;
         this.invitationMapper = invitationMapper;
@@ -48,6 +48,7 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.invitationRepository = invitationRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userDevicesRepository = userDevicesRepository;
     }
 
     @Override
@@ -125,6 +126,26 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new NotFoundException("User with login " + login + " not found");
         }
+    }
+
+    @Override
+    public StatusDTO addUserCode(Long userId, String userCode) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(new NotFoundException("User with id " + userId + " not found"));
+        UserDevices userDevice = UserDevices.builder()
+                .userCode(userCode)
+                .userId(user).build();
+        userDevice = userDevicesRepository.save(userDevice);
+        user.getUserDevices().add(userDevice);
+        userRepository.save(user);
+        return StatusDTO.builder().status(HttpStatus.OK).description("User device added").build();
+    }
+
+    @Override
+    public Set<String> getUserCode(Long userId) {
+        return userRepository.getById(userId).getUserDevices().stream()
+                .map(UserDevices::getUserCode)
+                .collect(Collectors.toSet());
     }
 
     @Override

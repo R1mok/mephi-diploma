@@ -1,6 +1,7 @@
 package ru.b19513.pet_manager.repository.entity;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -69,6 +70,9 @@ public class User implements UserDetails {
     @Column
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
+
+    @OneToMany
+    private Set<UserDevices> userDevices;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

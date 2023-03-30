@@ -8,6 +8,7 @@ import ru.b19513.pet_manager.repository.entity.User;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface UserService{
     UserDTO signInNewUser(String login, String pass, String name);
@@ -23,4 +24,6 @@ public interface UserService{
     List<UserDTO> findUsersByLogin(String login);
     UserDTO getUser(User user);
     Long getUserIdByLogin(String login);
+    StatusDTO addUserCode(Long userId, String userCode);
+    Set<String> getUserCode(Long userId);
 }
