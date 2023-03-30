@@ -16,15 +16,22 @@ import android.widget.RemoteViews
 import android.widget.Toast
 import androidx.annotation.IntegerRes
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.example.petschedule.MainActivity
 import com.example.petschedule.R
+import com.example.petschedule.composables.Screen
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import org.json.JSONObject
+import java.util.HashMap
 import java.util.concurrent.TimeUnit
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
@@ -67,7 +74,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
         // FCM registration token to your app server.
-        sendRegistrationToServer(token)
+        //sendRegistrationToServer(token)
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
@@ -77,6 +84,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             // Get new FCM registration token
             Log.d(TAG, task.result)
             Toast.makeText(baseContext, task.result, Toast.LENGTH_SHORT).show()
+            application.applicationContext.getSharedPreferences("_", MODE_PRIVATE)
+                .edit().putString("fcm", task.result).apply()
         })
         Log.d(TAG, FirebaseMessaging.getInstance().token.toString())
     }

@@ -192,6 +192,9 @@ fun authLogin(
             val obj = JSONObject(response)
             user.value.token = obj.getString("token")
             Log.d("MyLog", "Token: ${user.value.token}")
+            MainActivity.token = user.value.token
+            val fcm = context.getSharedPreferences("_", Context.MODE_PRIVATE).getString("fcm", "")
+            registerUserCode(fcm, context)
             navController
                 .navigate(Screen.MainScreen.withArgs(user.value.token))
         },
@@ -216,6 +219,33 @@ fun authLogin(
             params2["login"] = user.value.login
             params2["password"] = user.value.password
             return JSONObject(params2 as Map<*, *>).toString().toByteArray()
+        }
+    }
+    queue.add(stringRequest)
+}
+fun registerUserCode(
+    fcm: String?,
+    context: Context
+) {
+    val url = MainActivity.prefixUrl + "/user/add_user_code"
+
+    val queue = Volley.newRequestQueue(context)
+    val stringRequest = object : StringRequest(
+        Method.POST,
+        url,
+        {},
+        {
+            error -> Log.e("FCM", "Failed to add userCode, error: ${error.message}")
+        }) {
+        override fun getHeaders(): MutableMap<String, String> {
+            val headers = java.util.HashMap<String, String>()
+            headers["Authorization"] = MainActivity.token
+            return headers
+        }
+        override fun getParams(): Map<String, String> {
+            val params: MutableMap<String, String> = HashMap()
+            params["user_code"] = fcm.toString()
+            return params
         }
     }
     queue.add(stringRequest)

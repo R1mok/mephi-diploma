@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -41,9 +42,10 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         // local prefix
-        //var prefixUrl = "http://localhost:8091/shelter"
+        var prefixUrl = "http://localhost:8091/shelter"
         // server prefix
-        var prefixUrl = "https://psp.mephi.ru/shelter"
+        //var prefixUrl = "https://psp.mephi.ru/shelter"
+        var token = ""
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
