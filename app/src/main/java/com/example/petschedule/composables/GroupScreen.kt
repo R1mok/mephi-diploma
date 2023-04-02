@@ -207,7 +207,7 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
                             .fillMaxWidth(0.2f)
                     ) {
                         Text(
-                            text = "Dog",
+                            text = "Собака",
                             style = TextStyle(
                                 fontSize = 20.sp,
                                 color = Color.DarkGray
@@ -219,7 +219,7 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
                                 })
                         )
                         Text(
-                            text = "Cat",
+                            text = "Кошка",
                             style = TextStyle(
                                 fontSize = 20.sp,
                                 color = Color.DarkGray
@@ -270,7 +270,7 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
                             .fillMaxWidth(0.2f)
                     ) {
                         Text(
-                            text = "Male",
+                            text = "Мужской",
                             style = TextStyle(
                                 fontSize = 20.sp,
                                 color = Color.DarkGray
@@ -282,7 +282,7 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
                                 })
                         )
                         Text(
-                            text = "Female",
+                            text = "Женский",
                             style = TextStyle(
                                 fontSize = 20.sp,
                                 color = Color.DarkGray

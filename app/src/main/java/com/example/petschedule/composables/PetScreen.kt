@@ -2,7 +2,9 @@ package com.example.petschedule.composables
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,12 +42,18 @@ import com.android.volley.toolbox.Volley
 import com.example.petschedule.MainActivity
 import com.example.petschedule.R
 import com.example.petschedule.entities.FeedNote
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.time.timepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun PetScreenPreview() {
@@ -62,6 +70,7 @@ fun PetScreenPreview() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun PetScreen(
@@ -233,6 +242,7 @@ fun PetScreen(
             Row {
                 Button(
                     onClick = {
+                        isExpandedCreateSchedule = false
                         isExpandedCreateTimeout = !isExpandedCreateTimeout
                     },
                     shape = RoundedCornerShape(15.dp),
@@ -251,6 +261,7 @@ fun PetScreen(
                 Spacer(modifier = Modifier.padding(horizontal = 10.dp))
                 Button(
                     onClick = {
+                        isExpandedCreateTimeout = false
                         isExpandedCreateSchedule = !isExpandedCreateSchedule
                     },
                     shape = RoundedCornerShape(15.dp),
@@ -332,9 +343,10 @@ fun PetScreen(
                             .fillMaxHeight()
                     )
                     Spacer(modifier = Modifier.padding(horizontal = 10.dp))
-                    Button(onClick = {
-                        isExpandedTimeoutUnits = !isExpandedTimeoutUnits
-                    },
+                    Button(
+                        onClick = {
+                            isExpandedTimeoutUnits = !isExpandedTimeoutUnits
+                        },
                         shape = RoundedCornerShape(15.dp),
                         modifier = Modifier
                             .fillMaxWidth()
@@ -342,12 +354,14 @@ fun PetScreen(
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = Color.White,
                             contentColor = Color.White
-                        )) {
+                        )
+                    ) {
                         Text(
                             text = "Единицы времени: $timeUnitString",
                             style = TextStyle(
                                 fontSize = 20.sp,
-                            color = Color.DarkGray)
+                                color = Color.DarkGray
+                            )
                         )
                         DropdownMenu(
                             expanded = isExpandedTimeoutUnits,
@@ -427,9 +441,93 @@ fun PetScreen(
                     )
                 }
             }
-            //var scheduleComment by rememberSavable { mutableStateOf("") }
+            var scheduleComment by rememberSaveable { mutableStateOf("") }
             if (isExpandedCreateSchedule) {
-                // TODO сделать уведомления по расписанию
+                OutlinedTextField(
+                    value = scheduleComment,
+                    onValueChange = { scheduleComment = it },
+                    label = { Text("Сообщение в напоминании") },
+                    textStyle = TextStyle(fontSize = 25.sp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedLabelColor = Color.DarkGray,
+                        unfocusedLabelColor = Color.DarkGray,
+                        cursorColor = Color.Black,
+                        focusedBorderColor = Color.DarkGray,
+                        backgroundColor = Color.White,
+                        unfocusedBorderColor = Color.DarkGray,
+                        textColor = Color.DarkGray
+                    ),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
+                    ),
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
+                )
+                val dialogTimeState = rememberMaterialDialogState()
+                val timeString = rememberSaveable { mutableStateOf("") }
+                MaterialDialog(
+                    dialogState = dialogTimeState,
+                    buttons = {
+                        positiveButton("Ок")
+                        negativeButton("Отмена")
+                    }
+                ) {
+                    timepicker(title = "Выбрать время уведомления") { time ->
+                        //mTime.value = "${time.hour}:${time.minute}"
+                        timeString.value = time.toString()
+                    }
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Button(
+                        onClick = {
+                            dialogTimeState.show()
+                        },
+                        shape = RoundedCornerShape(15.dp),
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(
+                            text = "Добавить время: ${timeString.value}",
+                            style = TextStyle(fontSize = 20.sp, color = Color.DarkGray)
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            isExpandedCreateSchedule = false
+                            isExpandedCreateNotification = false
+                            createSchedule(context, MainActivity.token, groupId, petId, scheduleComment, timeString.value)
+                            timeString.value = ""
+                            scheduleComment = ""
+                        },
+                        shape = RoundedCornerShape(15.dp),
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(
+                            text = "Добавить",
+                            style = TextStyle(fontSize = 20.sp, color = Color.DarkGray)
+                        )
+                    }
+                }
             }
         }
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
@@ -541,13 +639,15 @@ fun getPetNotificationsByPetId(
             headers["Authorization"] = token
             return headers
         }
+
         override fun parseNetworkResponse(
             response: NetworkResponse
         ): Response<String> {
             var parsed: String
 
             val encoding = charset(
-                HttpHeaderParser.parseCharset(response.headers))
+                HttpHeaderParser.parseCharset(response.headers)
+            )
 
             try {
                 parsed = String(response.data, encoding)
@@ -610,6 +710,33 @@ fun createTimeout(
     val newElapsed = elapsed.toInt() * timeUnit
     val url = MainActivity.prefixUrl + "/notifications/timeout/?" +
             "groupId=$groupId&comment=$splitedComment&petId=$petId&elapsed=$newElapsed"
+    val queue = Volley.newRequestQueue(context)
+    val stringRequest = object : StringRequest(
+        Method.POST,
+        url,
+        { },
+        { error ->
+            Log.d("MyLog", "Error $error")
+        }) {
+        override fun getHeaders(): MutableMap<String, String> {
+            val headers = HashMap<String, String>()
+            headers["Authorization"] = token
+            return headers
+        }
+    }
+    queue.add(stringRequest)
+}
+fun createSchedule(
+    context: Context,
+    token: String,
+    groupId: String,
+    petId: String,
+    comment: String,
+    time: String
+) {
+    val splitedComment = comment.replace(" ", "%20")
+    val url = MainActivity.prefixUrl + "/notifications/schedule/?" +
+            "groupId=$groupId&comment=$splitedComment&petId=$petId&time=$time"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(
         Method.POST,

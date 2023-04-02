@@ -88,4 +88,7 @@ dependencies {
 
     // Work Manager
     implementation "androidx.work:work-runtime-ktx:2.8.1"
+
+    // Date and Time Picker
+    implementation "io.github.vanpra.compose-material-dialogs:datetime:0.9.0"
 }

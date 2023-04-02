@@ -121,6 +121,7 @@ fun MyGroups(navController: NavController, token: String) {
                         onDone = {
                             createGroup(token, groupName, context, groups)
                             isCreateGroup = false
+                            groupName = ""
                             focusManager.clearFocus()
                         }
                     ),
