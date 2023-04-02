@@ -32,18 +32,16 @@ public class NotificationController {
 
     @Operation(summary = "Добавить новое напоминание типа Timeout.")
     @PostMapping("/timeout/")
-    public ResponseEntity<NotificationTimeoutDTO> postNotificationTimeout(@RequestParam long groupId, @RequestParam String comment,
+    public ResponseEntity<StatusDTO> postNotificationTimeout(@RequestParam long groupId, @RequestParam String comment,
                                                           @RequestParam long petId, @RequestParam int elapsed) {
-        var notificationDTO = notificationService.createNotificationTimeout(groupId, petId, comment, elapsed);
-        return ResponseEntity.ok(notificationDTO);
+        return ResponseEntity.ok(notificationService.createNotificationTimeout(groupId, petId, comment, elapsed));
     }
 
     @Operation(summary = "Добавить новое напоминание типа Schedule.")
     @PostMapping("/schedule/")
-    public ResponseEntity<NotificationScheduleDTO> postNotificationSchedule(@RequestParam long groupId, @RequestParam String comment,
-                                                                            @RequestParam long petId, @RequestParam List<LocalTime> times) {
-        var notificationDTO = notificationService.createNotificationSchedule(groupId, petId, comment, times);
-        return ResponseEntity.ok(notificationDTO);
+    public ResponseEntity<StatusDTO> postNotificationSchedule(@RequestParam long groupId, @RequestParam String comment,
+                                                                            @RequestParam long petId, @RequestParam LocalTime time) {
+        return ResponseEntity.ok(notificationService.createNotificationSchedule(groupId, petId, comment, time));
     }
 
     @Operation(summary = "Изменить напоминание.")

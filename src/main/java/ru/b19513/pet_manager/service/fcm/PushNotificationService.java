@@ -24,12 +24,12 @@ public class PushNotificationService {
         this.fcmService = fcmService;
     }
 
-    @Scheduled(initialDelay = 60000, fixedDelay = 60000)
+    //@Scheduled(fixedDelay = 86400000)
     public void sendSamplePushNotification() {
         try {
             //fcmService.sendMessageWithoutData(getSamplePushNotificationRequest());
             PushNotificationRequest pushNotificationRequest = new PushNotificationRequest("title", "message", "topic");
-            pushNotificationRequest.setToken("coQ-q2tYSMigyl5N6t541D:APA91bFB9UW7bJGze286rtGKfgRcrkpuVCryEquvRA6-O_36USi21Kop9b_ToFWlqAZlG99oZQpdyofoMWrkc2HnqZD24N9MjtInnswcZPxRaMux2gm6I1CbR39IdqxgDU4IQoY_9QhN");
+            //pushNotificationRequest.setToken("coQ-q2tYSMigyl5N6t541D:APA91bFB9UW7bJGze286rtGKfgRcrkpuVCryEquvRA6-O_36USi21Kop9b_ToFWlqAZlG99oZQpdyofoMWrkc2HnqZD24N9MjtInnswcZPxRaMux2gm6I1CbR39IdqxgDU4IQoY_9QhN");
             fcmService.sendMessageToToken(pushNotificationRequest);
         } catch (InterruptedException | ExecutionException e) {
             logger.error(e.getMessage());

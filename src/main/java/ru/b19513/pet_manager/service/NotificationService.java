@@ -10,9 +10,9 @@ import java.time.LocalTime;
 import java.util.List;
 
 public interface NotificationService {
-    NotificationTimeoutDTO createNotificationTimeout(long groupId, long petId, String comment, long elapsed);
+    StatusDTO createNotificationTimeout(long groupId, long petId, String comment, long elapsed);
 
-    NotificationScheduleDTO createNotificationSchedule(long groupId, long petId, String comment, List<LocalTime> times);
+    StatusDTO createNotificationSchedule(long groupId, long petId, String comment, LocalTime time);
 
     NotificationScheduleDTO updateNotificationSchedule(NotificationScheduleDTO notif);
 

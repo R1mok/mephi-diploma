@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
+import org.threeten.bp.chrono.ChronoPeriod;
 import ru.b19513.pet_manager.controller.entity.NotificationDTO;
 import ru.b19513.pet_manager.controller.entity.NotificationScheduleDTO;
 import ru.b19513.pet_manager.controller.entity.NotificationTimeoutDTO;
@@ -19,10 +20,11 @@ import ru.b19513.pet_manager.service.mapper.NotificationMapper;
 
 import java.time.*;
 import java.time.chrono.ChronoLocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
+import java.util.*;
 
 import static ru.b19513.pet_manager.consts.Consts.NOTIFICATION_DELETED;
 import static ru.b19513.pet_manager.consts.Consts.NOTIFICATION_NOTE_UPDATED;
@@ -57,11 +59,15 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public NotificationTimeoutDTO createNotificationTimeout(long groupId, long petId, String comment, long elapsed) {
+    public StatusDTO createNotificationTimeout(long groupId, long petId, String comment, long elapsed) {
         var group = groupRepository.findById(groupId)
                 .orElseThrow(new NotFoundException("Group with group id " + groupId + " not found"));
         var pet = petRepository.findById(petId)
                 .orElseThrow(new NotFoundException("Pet with pet id " + petId + " not found"));
+        group.getUsers().forEach(user -> user.getUserDevices()
+                .forEach(userDevice -> threadPoolTaskScheduler.schedule(
+                        () -> sendNotification(group.getName(), pet.getName(), userDevice.getUserCode(), comment),
+                        Instant.now().plus(elapsed, ChronoUnit.SECONDS))));
         var notificationTimeout = NotificationTimeout.builder()
                 .elapsed(elapsed)
                 .group(group)
@@ -69,15 +75,6 @@ public class NotificationServiceImpl implements NotificationService {
                 .comment(comment)
                 .enabled(true)
                 .build();
-        group.getUsers().forEach(user -> user.getUserDevices()
-                .forEach(userDevice -> threadPoolTaskScheduler.scheduleWithFixedDelay(() -> {
-            PushNotificationRequest request = new PushNotificationRequest(
-                    "Уведомление от группы " + group.getName() + " для питомца " + pet.getName(),
-                    comment,
-                    "topic");
-            request.setToken(userDevice.getUserCode());
-            pushNotificationService.sendPushNotificationToToken(request);
-        }, elapsed * 1000)));
         notificationTimeout.setTime(LocalDateTime.now());
         var notifSet = pet.getNotifications(); // добавляю к питомцу созданное уведомление
         if (notifSet == null) {
@@ -90,20 +87,21 @@ public class NotificationServiceImpl implements NotificationService {
         }
         var notifInRepo = notificationRepository.save(notificationTimeout);
         group.getNotificationList().addAll(notifSet);
-        //groupRepository.save(group);
-        return notificationMapper.entityToDTO(notifInRepo);
+        return StatusDTO.builder().status(HttpStatus.OK).description("Timeout notification added").build();
     }
 
     @Override
-    public NotificationScheduleDTO createNotificationSchedule(long groupId, long petId, String comment, List<LocalTime> times) {
+    public StatusDTO createNotificationSchedule(long groupId, long petId, String comment, LocalTime time) {
         var group = groupRepository.findById(groupId)
                 .orElseThrow(new NotFoundException("Group with group id " + groupId + " not found"));
         var pet = petRepository.findById(petId)
                 .orElseThrow(new NotFoundException("Pet with pet id " + petId + " not found"));
+        group.getUsers().forEach(user -> user.getUserDevices()
+                .forEach(userDevice -> threadPoolTaskScheduler.scheduleWithFixedDelay(
+                        () -> sendNotification(group.getName(), pet.getName(), userDevice.getUserCode(), comment),
+                        Date.from(time.atDate(LocalDate.now()).toInstant(ZoneOffset.ofHours(2))), 60000*60*24)));
         var scheduleTimeList = new ArrayList<ScheduleTime>();
-        for (LocalTime time : times) {
-            scheduleTimeList.add(ScheduleTime.builder().notifTime(time).build());
-        }
+        scheduleTimeList.add(ScheduleTime.builder().notifTime(time).build());
         var notificationSchedule = NotificationSchedule.builder()
                 .times(scheduleTimeList)
                 .group(group)
@@ -117,8 +115,18 @@ public class NotificationServiceImpl implements NotificationService {
         }
         notifSet.add(notificationSchedule);
         pet.setNotifications(notifSet);
-        var notifInRepo = notificationRepository.save(notificationSchedule);
-        return notificationMapper.entityToDTO(notifInRepo);
+        notificationRepository.save(notificationSchedule);
+        return StatusDTO.builder().status(HttpStatus.OK).description("Scheduled notification added").build();
+    }
+
+    private void sendNotification(String groupName, String petName, String userCode, String comment) {
+        PushNotificationRequest request = new PushNotificationRequest(
+                groupName + ": " + petName + "\"",
+                comment,
+                "topic");
+        request.setToken(userCode);
+        pushNotificationService.sendPushNotificationToToken(request);
+
     }
 
     @Override
@@ -168,12 +176,12 @@ public class NotificationServiceImpl implements NotificationService {
                 var alarmTime = notif.getTime().plusSeconds(notif.getElapsed());
                 boolean notTimeToSend = false;
                 //if (notif.getTimes() != null)
-                    for (var period : notif.getTimes()) {
-                        if (alarmTime.isAfter(ChronoLocalDateTime.from(period.getTimeFrom())) &&
-                                alarmTime.isBefore(ChronoLocalDateTime.from(period.getTimeTo()))) {
-                            notTimeToSend = true;
-                        }
-                   }
+                for (var period : notif.getTimes()) {
+                    if (alarmTime.isAfter(ChronoLocalDateTime.from(period.getTimeFrom())) &&
+                            alarmTime.isBefore(ChronoLocalDateTime.from(period.getTimeTo()))) {
+                        notTimeToSend = true;
+                    }
+                }
                 if (!notTimeToSend && alarmTime.isBefore(ChronoLocalDateTime.from(LocalDateTime.now()))) {
                     resultNotificationList.add(notificationMapper.entityToDTO(notif));
                 }

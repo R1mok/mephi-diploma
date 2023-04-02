@@ -135,10 +135,13 @@ public class UserServiceImpl implements UserService {
         UserDevices userDevice = UserDevices.builder()
                 .userCode(userCode)
                 .userId(user).build();
-        userDevice = userDevicesRepository.save(userDevice);
-        user.getUserDevices().add(userDevice);
-        userRepository.save(user);
-        return StatusDTO.builder().status(HttpStatus.OK).description("User device added").build();
+        Optional<UserDevices> userDeviceInRepository = userDevicesRepository.findById(userCode);
+        if (userDeviceInRepository.isEmpty()) {
+            userDevice = userDevicesRepository.save(userDevice);
+            user.getUserDevices().add(userDevice);
+            userRepository.save(user);
+            return StatusDTO.builder().status(HttpStatus.OK).description("User device added").build();
+        } else return StatusDTO.builder().status(HttpStatus.OK).description("User device already added").build();
     }
 
     @Override
