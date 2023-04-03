@@ -3,6 +3,7 @@ package ru.b19513.pet_manager.repository.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.List;
 
 @AllArgsConstructor
@@ -41,4 +42,7 @@ public abstract class Notification {
     @ManyToOne
     @JoinColumn
     private Pet pet;
+
+    @Column
+    private Instant alarmTime;
 }

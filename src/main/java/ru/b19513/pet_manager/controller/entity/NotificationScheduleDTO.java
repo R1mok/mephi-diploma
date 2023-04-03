@@ -1,6 +1,8 @@
 package ru.b19513.pet_manager.controller.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.time.Instant;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.Builder;
@@ -16,8 +18,8 @@ public class NotificationScheduleDTO extends NotificationDTO {
 
     @Builder
     public NotificationScheduleDTO(long id, long groupId, boolean enabled, String comment, String groupName, String petName,
-            List<LocalTime> times) {
-        super(id, groupId, enabled, comment, groupName, petName);
+            List<LocalTime> times, Instant alarmTime) {
+        super(id, groupId, enabled, comment, groupName, petName, alarmTime);
         this.times = times;
     }
 

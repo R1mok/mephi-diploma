@@ -99,7 +99,8 @@ public class NotificationServiceImpl implements NotificationService {
         group.getUsers().forEach(user -> user.getUserDevices()
                 .forEach(userDevice -> threadPoolTaskScheduler.scheduleWithFixedDelay(
                         () -> sendNotification(group.getName(), pet.getName(), userDevice.getUserCode(), comment),
-                        Date.from(time.atDate(LocalDate.now()).toInstant(ZoneOffset.ofHours(2))), 60000*60*24)));
+                        Date.from(time.atDate(LocalDate.now().plusDays(1)).toInstant(ZoneOffset.ofHours(5))), 60000*60*24)));
+        // если LocalTime до текущего времени - завтрашний день, если после, то как сейчас
         var scheduleTimeList = new ArrayList<ScheduleTime>();
         scheduleTimeList.add(ScheduleTime.builder().notifTime(time).build());
         var notificationSchedule = NotificationSchedule.builder()
@@ -109,6 +110,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .enabled(true)
                 .pet(pet)
                 .build();
+        notificationSchedule.setAlarmTime(time.atDate(LocalDate.now()).toInstant(ZoneOffset.ofHours(5)));
         var notifSet = pet.getNotifications(); // добавляю к питомцу созданное уведомление
         if (notifSet == null) {
             notifSet = new HashSet<>();
@@ -121,7 +123,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void sendNotification(String groupName, String petName, String userCode, String comment) {
         PushNotificationRequest request = new PushNotificationRequest(
-                groupName + ": " + petName + "\"",
+                groupName + ": " + petName,
                 comment,
                 "topic");
         request.setToken(userCode);
@@ -174,6 +176,7 @@ public class NotificationServiceImpl implements NotificationService {
                 //if (fn != null) {
                 //LocalDateTime alarmTime = fn.getDateTime().plusSeconds((notif.getElapsed()));
                 var alarmTime = notif.getTime().plusSeconds(notif.getElapsed());
+                notif.setAlarmTime(alarmTime.toInstant(ZoneOffset.ofHours(5)));
                 boolean notTimeToSend = false;
                 //if (notif.getTimes() != null)
                 for (var period : notif.getTimes()) {
@@ -182,9 +185,7 @@ public class NotificationServiceImpl implements NotificationService {
                         notTimeToSend = true;
                     }
                 }
-                if (!notTimeToSend && alarmTime.isBefore(ChronoLocalDateTime.from(LocalDateTime.now()))) {
-                    resultNotificationList.add(notificationMapper.entityToDTO(notif));
-                }
+                resultNotificationList.add(notificationMapper.entityToDTO(notif));
                 //}
             } else if (notification instanceof NotificationSchedule) {
                 var notif = (NotificationSchedule) notification;

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,4 +24,6 @@ public abstract class NotificationDTO {
     private String groupName;
     @Schema(description = "Имя питомца")
     private String petName;
+    @Schema(description =  "Время срабатывания уведомления")
+    private Instant alarmTime;
 }
