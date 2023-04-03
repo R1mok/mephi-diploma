@@ -36,6 +36,7 @@ import com.android.volley.toolbox.Volley
 import com.example.petschedule.MainActivity
 import com.example.petschedule.R
 import com.example.petschedule.entities.InvitationInGroup
+import com.example.petschedule.entities.Notification
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
@@ -59,69 +60,114 @@ fun UserAccountPreview() {
 
 
 @Composable
-fun UserAccount(navController: NavController, token : String) {
+fun UserAccount(navController: NavController, token: String) {
     if (false)
         navController.navigate(Screen.UserAccount.withArgs(token))
 
     var groupsInvitation = remember {
         mutableStateOf(mutableListOf<InvitationInGroup>())
     }
+    var notificationList = remember {
+        mutableStateOf(mutableListOf<Notification>())
+    }
 
     val context = LocalContext.current
     getInvitationInGroup(context, token, groupsInvitation)
+    getNotificationList(context, token, notificationList)
 
     Column(
         modifier = Modifier
-            .padding(vertical = 50.dp)
+            .padding(vertical = 30.dp)
             .padding(horizontal = 10.dp)
             .fillMaxWidth()
     ) {
 
-        Text(
-            text = "Список приглашений в группы",
-            style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-        )
-        if (groupsInvitation.value.size == 0) {
+        Column (modifier = Modifier.fillMaxHeight(0.7f)){
             Text(
-                text = "Нет активных приглашений",
-                style = TextStyle(fontSize = 18.sp, color = Color.DarkGray),
+                text = "Текущие уведомления",
+                style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 5.dp)
             )
-        }
-        val (showDialog, setShowDialog) =  remember { mutableStateOf(false) }
-        LazyColumn(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(vertical = 40.dp)
-        ) {
-            items(groupsInvitation.value) { invitation ->
-                Button(
-                    onClick = {
-                        setShowDialog(true)
-                    },
-                    shape = RoundedCornerShape(15.dp),
-                    modifier = Modifier.padding(5.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.White,
-                        contentColor = Color.Gray
-                    )
-                ) {
-                    Text(
-                        text = "${invitation.id}: ${invitation.name}",
-                        color = Color.DarkGray,
-                        fontSize = 30.sp
-                    )
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 40.dp)) {
+                items(notificationList.value) { notification ->
+                    Button(
+                        onClick = {},
+                        shape = RoundedCornerShape(15.dp),
+                        modifier = Modifier.padding(5.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = Color.Gray
+                        )
+                    ) {
+                        Column {
+                            Text(
+                                text = "Группа: ${notification.groupName}\nПитомец: ${notification.petName}",
+                                color = Color.DarkGray,
+                                fontSize = 20.sp
+                            )
+                            Text(
+                                text = "Комментарий: ${notification.comment}\nВремя: ${notification.time}",
+                                color = Color.DarkGray,
+                                fontSize = 20.sp
+                            )
+                        }
+                    }
                 }
-                DialogDemo(showDialog, setShowDialog, context, token, invitation.id)
+            }
+        }
+        Column {
+            Text(
+                text = "Список приглашений в группы",
+                style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+            )
+            if (groupsInvitation.value.size == 0) {
+                Text(
+                    text = "Нет активных приглашений",
+                    style = TextStyle(fontSize = 18.sp, color = Color.DarkGray),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(vertical = 5.dp)
+                )
+            }
+            val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 40.dp)
+            ) {
+                items(groupsInvitation.value) { invitation ->
+                    Button(
+                        onClick = {
+                            setShowDialog(true)
+                        },
+                        shape = RoundedCornerShape(15.dp),
+                        modifier = Modifier.padding(5.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = Color.White,
+                            contentColor = Color.Gray
+                        )
+                    ) {
+                        Text(
+                            text = "${invitation.id}: ${invitation.name}",
+                            color = Color.DarkGray,
+                            fontSize = 30.sp
+                        )
+                    }
+                    DialogDemo(showDialog, setShowDialog, context, token, invitation.id)
+                }
             }
         }
     }
 }
+
 fun getInvitationInGroup(
     context: Context,
     token: String,
@@ -162,7 +208,8 @@ fun getInvitationInGroup(
             var parsed: String
 
             val encoding = charset(
-                HttpHeaderParser.parseCharset(response.headers))
+                HttpHeaderParser.parseCharset(response.headers)
+            )
 
             try {
                 parsed = String(response.data, encoding)
@@ -181,6 +228,65 @@ fun getInvitationInGroup(
     queue.add(stringRequest)
 }
 
+fun getNotificationList(
+    context: Context,
+    token: String,
+    notificationList: MutableState<MutableList<Notification>>
+) {
+    val url = MainActivity.prefixUrl + "/notifications/show"
+    val queue = Volley.newRequestQueue(context)
+    val stringRequest = object : StringRequest(
+        Method.GET,
+        url,
+        { response ->
+            val obj = JSONArray(response)
+            Log.d("MyLog", "obj length = ${obj.length()}")
+            val newNotification = mutableListOf<Notification>()
+            for (i in 0 until obj.length()) {
+                val jsonObject = JSONObject(obj.getString(i))
+                Log.d("MyLog", "i = $i, value = $jsonObject")
+                val groupName = jsonObject.getString("groupName")
+                val petName = jsonObject.getString("petName")
+                val comment = jsonObject.getString("comment")
+                val alarmTime = jsonObject.getString("alarmTime")
+                newNotification.add(Notification(groupName, petName, comment, alarmTime))
+            }
+            notificationList.value = newNotification
+        },
+        { error ->
+            Log.d("MyLog", "Error $error")
+        }) {
+        override fun getHeaders(): MutableMap<String, String> {
+            val headers = HashMap<String, String>()
+            headers["Authorization"] = token
+            return headers
+        }
+
+        override fun parseNetworkResponse(
+            response: NetworkResponse
+        ): Response<String> {
+            var parsed: String
+
+            val encoding = charset(
+                HttpHeaderParser.parseCharset(response.headers)
+            )
+
+            try {
+                parsed = String(response.data, encoding)
+                val bytes = parsed.toByteArray(encoding)
+                parsed = String(bytes, Charset.forName("UTF-8"))
+
+                return Response.success(
+                    parsed,
+                    HttpHeaderParser.parseCacheHeaders(response)
+                )
+            } catch (e: UnsupportedEncodingException) {
+                return Response.error(ParseError(e))
+            }
+        }
+    }
+    queue.add(stringRequest)
+}
 @Composable
 fun DialogDemo(
     showDialog: Boolean,
@@ -218,6 +324,7 @@ fun DialogDemo(
         )
     }
 }
+
 fun acceptInvitation(
     context: Context,
     token: String,
