@@ -31,10 +31,6 @@ public abstract class Notification {
     @Column
     private String comment;
 
-    @Column
-    @OneToMany(mappedBy = "notification")
-    private List<NotificationNote> notificationNotes;
-
     @JoinColumn
     @ManyToOne
     private Group group;

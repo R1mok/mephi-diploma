@@ -21,6 +21,4 @@ public interface NotificationService {
     List<NotificationDTO> showNotification(User user);
 
     StatusDTO deleteNotification( long notifId);
-
-    StatusDTO setTimeInNotificationNote(User user, List<Long> notificationsId);
 }

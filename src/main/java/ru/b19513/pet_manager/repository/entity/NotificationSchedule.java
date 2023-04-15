@@ -3,6 +3,7 @@ package ru.b19513.pet_manager.repository.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -13,11 +14,7 @@ import java.util.List;
 public class NotificationSchedule extends Notification {
 
     @Builder
-    public NotificationSchedule(Group group, Pet pet, String comment, List<ScheduleTime> times, boolean enabled){
+    public NotificationSchedule(Group group, Pet pet, String comment, boolean enabled){
         super(group, pet, comment, enabled);
-        this.times = times;
     }
-
-    @OneToMany(mappedBy = "notification")
-    private List<ScheduleTime> times;
 }

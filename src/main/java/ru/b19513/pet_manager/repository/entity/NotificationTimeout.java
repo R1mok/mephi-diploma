@@ -24,7 +24,4 @@ public class NotificationTimeout extends Notification {
 
     @Column
     private LocalDateTime time;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "notification")
-    private List<Period> times;
 }

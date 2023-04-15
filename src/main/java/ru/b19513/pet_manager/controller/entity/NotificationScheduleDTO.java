@@ -17,12 +17,8 @@ import lombok.Setter;
 public class NotificationScheduleDTO extends NotificationDTO {
 
     @Builder
-    public NotificationScheduleDTO(long id, long groupId, boolean enabled, String comment, String groupName, String petName,
-            List<LocalTime> times, Instant alarmTime) {
+    public NotificationScheduleDTO(long id, long groupId, boolean enabled, String comment, String groupName,
+                                   String petName, Instant alarmTime) {
         super(id, groupId, enabled, comment, groupName, petName, alarmTime);
-        this.times = times;
     }
-
-    @Schema(description = "Массив времен, когда нужно нужно посылать уведомление")
-    private List<LocalTime> times;
 }

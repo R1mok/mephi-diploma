@@ -34,8 +34,6 @@ class NotificationServiceImplTest {
     @Autowired
     GroupRepository groupRepository;
     @Autowired
-    NotificationNoteRepository notificationNoteRepository;
-    @Autowired
     PetRepository petRepository;
     @Autowired
     UserService userService;
@@ -84,9 +82,4 @@ class NotificationServiceImplTest {
 
     }
 
-    @Test
-    @Transactional
-    void setTimeInNotificationNote() {
-
-    }
 }

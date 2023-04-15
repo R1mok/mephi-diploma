@@ -15,7 +15,7 @@ import ru.b19513.pet_manager.repository.FeedNoteRepository;
 import ru.b19513.pet_manager.repository.GroupRepository;
 import ru.b19513.pet_manager.repository.PetRepository;
 import ru.b19513.pet_manager.repository.UserRepository;
-import ru.b19513.pet_manager.repository.entity.FeedNote;
+import ru.b19513.pet_manager.repository.entity.Note;
 import ru.b19513.pet_manager.repository.entity.Pet;
 import ru.b19513.pet_manager.repository.entity.PetParameters;
 import ru.b19513.pet_manager.service.PetService;
@@ -116,7 +116,7 @@ public class PetServiceImpl implements PetService {
     public FeedNoteDTO createFeedNote(long petId, long userId, String comment) {
             var pet = petRepository.findById(petId).orElseThrow(new NotFoundException("Pet with pet id " + petId + " not found"));
         var user = userRepository.findById(userId).orElseThrow(new NotFoundException("User with user id " + userId + " not found"));
-        var newFeedNote = FeedNote.builder()
+        var newFeedNote = Note.builder()
                 .pet(pet)
                 .user(user)
                 .dateTime(LocalDateTime.now())
