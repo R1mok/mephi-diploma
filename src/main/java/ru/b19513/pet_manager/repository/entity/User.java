@@ -25,7 +25,6 @@ import org.hibernate.annotations.NaturalId;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.b19513.pet_manager.repository.entity.enums.Gender;
-
 @Entity
 @Getter
 @Setter
@@ -34,71 +33,55 @@ import ru.b19513.pet_manager.repository.entity.enums.Gender;
 @AllArgsConstructor
 @Table(name = "T_USER")
 public class User implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
     @NaturalId
     @Column(nullable = false, unique = true)
     private String login;
-
     @Column(nullable = false)
     private String name;
-
     @Column
     private String about;
-
     @Column
     private String password;
 
     @Column
     @ManyToMany(mappedBy = "users")
     private Set<Group> groups;
-
     @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
     private Set<Group> ownedGroups;
-
     @Column
     @Enumerated(EnumType.ORDINAL)
     private Gender gender;
-
     @Column
     @OneToMany(fetch = FetchType.EAGER)
     private Set<Invitation> invitations;
-
     @Column
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
-
     @OneToMany
     private Set<UserDevices> userDevices;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
     }
-
     @Override
     public String getUsername() {
         return login;
     }
-
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
-
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
-
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
-
     @Override
     public boolean isEnabled() {
         return true;

@@ -1,5 +1,6 @@
 package ru.b19513.pet_manager.service.impl;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -18,6 +19,7 @@ import ru.b19513.pet_manager.service.fcm.PushNotificationService;
 import ru.b19513.pet_manager.service.mapper.NotificationMapper;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -66,6 +68,8 @@ public class NotificationServiceImpl implements NotificationService {
                 .comment(comment)
                 .enabled(true)
                 .build();
+        notificationTimeout.setAlarmTime(Instant.parse(LocalDateTime.now().plusSeconds(elapsed)
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))));
         notificationTimeout.setTime(LocalDateTime.now());
         var notifSet = pet.getNotifications(); // добавляю к питомцу созданное уведомление
         if (notifSet == null) {
@@ -88,17 +92,16 @@ public class NotificationServiceImpl implements NotificationService {
         var pet = petRepository.findById(petId)
                 .orElseThrow(new NotFoundException("Pet with pet id " + petId + " not found"));
         Date dateTime = LocalTime.now().isAfter(time)
-                ? Date.from(time.atDate(LocalDate.now().plusDays(1)).toInstant(ZoneOffset.ofHours(5)))
-                : Date.from(time.atDate(LocalDate.now()).toInstant(ZoneOffset.ofHours(5)));
+                ? Date.from(time.atDate(LocalDate.now().plusDays(1)).toInstant(ZoneOffset.ofHours(3)))
+                : Date.from(time.atDate(LocalDate.now()).toInstant(ZoneOffset.ofHours(3)));
         group.getUsers().forEach(user -> user.getUserDevices()
                 .forEach(userDevice -> threadPoolTaskScheduler.scheduleWithFixedDelay(
                         () -> sendNotification(group.getName(), pet.getName(), userDevice.getUserCode(), comment),
                         dateTime, 60000 * 60 * 24)));
-        // если LocalTime до текущего времени - завтрашний день, если после, то как сейчас
         var notificationSchedule = NotificationSchedule.builder()
                 .group(group)
                 .comment(comment)
-                .enabled(true)
+                .enabled(false)
                 .pet(pet)
                 .build();
         notificationSchedule.setAlarmTime(time.atDate(LocalDate.now()).toInstant(ZoneOffset.ofHours(0)));
@@ -162,20 +165,12 @@ public class NotificationServiceImpl implements NotificationService {
         for (var notification : notificationList) {
             if (notification instanceof NotificationTimeout) {
                 var notif = (NotificationTimeout) notification;
-                var pet = notif.getPet();
-                //var fn = feedNoteRepository.findFirstByPetIdOrderByDateTimeDesc(pet.getId());
-                //if (fn != null) {
-                //LocalDateTime alarmTime = fn.getDateTime().plusSeconds((notif.getElapsed()));
-                var alarmTime = notif.getTime().plusSeconds(notif.getElapsed());
-                notif.setAlarmTime(alarmTime.toInstant(ZoneOffset.UTC));
-                boolean notTimeToSend = false;
-                //if (notif.getTimes() != null)
-                if (alarmTime.isAfter(LocalDateTime.now())) {
+                if (notif.getAlarmTime().isAfter(Instant.parse(LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))))) {
                     resultNotificationList.add(notificationMapper.entityToDTO(notif));
                 } else {
                     deleteNotification(notification.getId());
                 }
-                //}
             } else if (notification instanceof NotificationSchedule) {
                 var notif = (NotificationSchedule) notification;
                 resultNotificationList.add(notificationMapper.entityToDTO(notif));

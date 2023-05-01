@@ -75,7 +75,6 @@ public class PetServiceImpl implements PetService {
         return petMapper.entityToDTO(petRepository.save(pet));
     }
 
-
     @Override
     public PetDTO getPet(long petId) {
         var pet = petRepository
@@ -163,6 +162,7 @@ public class PetServiceImpl implements PetService {
             return petMapper.entityToDTO(petRepository.save(pet));
         }
     }
+
     @Override
     public Collection<PetParametersDTO> getPetParameters(long petId) {
         var pet0 = petRepository.findById(petId);
