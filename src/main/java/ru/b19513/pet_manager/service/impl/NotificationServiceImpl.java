@@ -68,8 +68,13 @@ public class NotificationServiceImpl implements NotificationService {
                 .comment(comment)
                 .enabled(true)
                 .build();
-        notificationTimeout.setAlarmTime(Instant.parse(LocalDateTime.now().plusSeconds(elapsed)
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))));
+        notificationTimeout.setAlarmTime(
+                Instant.parse(
+                        ZonedDateTime.now(ZoneOffset.ofHours(3))
+                                .plusSeconds(elapsed)
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+                )
+        );
         notificationTimeout.setTime(LocalDateTime.now());
         var notifSet = pet.getNotifications(); // добавляю к питомцу созданное уведомление
         if (notifSet == null) {
@@ -91,7 +96,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .orElseThrow(new NotFoundException("Group with group id " + groupId + " not found"));
         var pet = petRepository.findById(petId)
                 .orElseThrow(new NotFoundException("Pet with pet id " + petId + " not found"));
-        Date dateTime = LocalTime.now().isAfter(time)
+        Date dateTime = ZonedDateTime.now().isAfter(ZonedDateTime.of(time.atDate(LocalDate.now()), ZoneId.of("UTC+3")))
                 ? Date.from(time.atDate(LocalDate.now().plusDays(1)).toInstant(ZoneOffset.ofHours(3)))
                 : Date.from(time.atDate(LocalDate.now()).toInstant(ZoneOffset.ofHours(3)));
         group.getUsers().forEach(user -> user.getUserDevices()
@@ -165,8 +170,9 @@ public class NotificationServiceImpl implements NotificationService {
         for (var notification : notificationList) {
             if (notification instanceof NotificationTimeout) {
                 var notif = (NotificationTimeout) notification;
-                if (notif.getAlarmTime().isAfter(Instant.parse(LocalDateTime.now()
-                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))))) {
+                if (notif.getAlarmTime().isAfter(
+                        Instant.parse(ZonedDateTime.now(ZoneOffset.ofHours(3))
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))))) {
                     resultNotificationList.add(notificationMapper.entityToDTO(notif));
                 } else {
                     deleteNotification(notification.getId());
