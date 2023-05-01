@@ -117,7 +117,8 @@ fun WalkingSchedule(navController: NavController, token: String) {
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = Color.White,
                             contentColor = Color.Gray
-                        )
+                        ),
+                        modifier = Modifier.padding(vertical = 10.dp).fillMaxWidth(0.9f)
                     ) {
                         Column {
                             Button(

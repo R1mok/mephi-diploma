@@ -42,9 +42,9 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         // local prefix
-        var prefixUrl = "http://localhost:8091/shelter"
+        //var prefixUrl = "http://localhost:8091/shelter"
         // server prefix
-        //var prefixUrl = "https://psp.mephi.ru/shelter"
+        var prefixUrl = "https://psp.mephi.ru/shelter"
         var token = ""
     }
 

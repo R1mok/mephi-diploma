@@ -1,10 +1,13 @@
 package com.example.petschedule.composables
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
@@ -41,8 +44,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
-import java.util.HashMap
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun UserAccountPreview() {
@@ -59,6 +65,7 @@ fun UserAccountPreview() {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserAccount(navController: NavController, token: String) {
     if (false)
@@ -81,42 +88,55 @@ fun UserAccount(navController: NavController, token: String) {
             .padding(horizontal = 10.dp)
             .fillMaxWidth()
     ) {
-
-        Column (modifier = Modifier.fillMaxHeight(0.7f)){
+        val (showDeleteNotificationDialog, setShowDeleteNotificationDialog) = remember {
+            mutableStateOf(false)
+        }
+        Column(modifier = Modifier.fillMaxHeight(0.7f)) {
             Text(
                 text = "Текущие уведомления",
                 style = TextStyle(fontSize = 25.sp, color = Color.DarkGray),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             )
+            var deletedIndex = remember { mutableStateOf(0) }
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(vertical = 40.dp)) {
-                items(notificationList.value) { notification ->
+                    .padding(vertical = 40.dp)
+            ) {
+                itemsIndexed(notificationList.value) { index, notification ->
                     Button(
-                        onClick = {},
+                        onClick = {
+                            setShowDeleteNotificationDialog(true)
+                            deletedIndex.value = index
+                        },
                         shape = RoundedCornerShape(15.dp),
-                        modifier = Modifier.padding(5.dp),
+                        modifier = Modifier.padding(5.dp).fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = Color.White,
                             contentColor = Color.Gray
                         )
                     ) {
-                        Column {
-                            Text(
-                                text = "Группа: ${notification.groupName}\nПитомец: ${notification.petName}",
-                                color = Color.DarkGray,
-                                fontSize = 20.sp
-                            )
-                            Text(
-                                text = "Комментарий: ${notification.comment}\nВремя: ${notification.time}",
-                                color = Color.DarkGray,
-                                fontSize = 20.sp
-                            )
-                        }
+                        Text(
+                            text = "Группа: ${notification.groupName}\n" +
+                                    "Питомец: ${notification.petName}\n" +
+                                    "Тип уведомления: ${notification.notificationType}\n" +
+                                    "Комментарий: ${notification.comment}\n" +
+                                    "Время: ${notification.time}",
+                            color = Color.DarkGray,
+                            fontSize = 20.sp,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
+                    showDeleteNotificationDialog(
+                        showDeleteNotificationDialog,
+                        setShowDeleteNotificationDialog,
+                        context,
+                        token,
+                        deletedIndex.value,
+                        notificationList
+                    )
                 }
             }
         }
@@ -156,12 +176,12 @@ fun UserAccount(navController: NavController, token: String) {
                         )
                     ) {
                         Text(
-                            text = "${invitation.id}: ${invitation.name}",
+                            text = invitation.name,
                             color = Color.DarkGray,
                             fontSize = 30.sp
                         )
                     }
-                    DialogDemo(showDialog, setShowDialog, context, token, invitation.id)
+                    showInviteDialog(showDialog, setShowDialog, context, token, invitation.id)
                 }
             }
         }
@@ -235,7 +255,8 @@ fun getNotificationList(
 ) {
     val url = MainActivity.prefixUrl + "/notifications/show"
     val queue = Volley.newRequestQueue(context)
-    val stringRequest = object : StringRequest(
+    val stringRequest = @RequiresApi(Build.VERSION_CODES.O)
+    object : StringRequest(
         Method.GET,
         url,
         { response ->
@@ -245,11 +266,25 @@ fun getNotificationList(
             for (i in 0 until obj.length()) {
                 val jsonObject = JSONObject(obj.getString(i))
                 Log.d("MyLog", "i = $i, value = $jsonObject")
+                val id = jsonObject.getString("id")
+                val isTimeout = jsonObject.getString("enabled")
+                val notifType = if (isTimeout.equals("true")) "Отсчет" else "Расписание"
                 val groupName = jsonObject.getString("groupName")
                 val petName = jsonObject.getString("petName")
                 val comment = jsonObject.getString("comment")
                 val alarmTime = jsonObject.getString("alarmTime")
-                newNotification.add(Notification(groupName, petName, comment, alarmTime))
+                var formatter = DateTimeFormatter.ofPattern(
+                    "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                    Locale.ENGLISH
+                )
+                var date = LocalDateTime.parse(alarmTime, formatter)
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                newNotification.add(
+                    Notification(
+                        id, groupName, petName, comment, date.toString(),
+                        notifType
+                    )
+                )
             }
             notificationList.value = newNotification
         },
@@ -287,8 +322,75 @@ fun getNotificationList(
     }
     queue.add(stringRequest)
 }
+
 @Composable
-fun DialogDemo(
+fun showDeleteNotificationDialog(
+    showDialog: Boolean,
+    setShowDialog: (Boolean) -> Unit,
+    context: Context,
+    token: String,
+    index: Int,
+    notificationList: MutableState<MutableList<Notification>>
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+            },
+            title = {
+                Text("Удалить уведомление?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        setShowDialog(false)
+                        deleteNotification(context, token, index, notificationList)
+                    },
+                ) {
+                    Text("Да")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        setShowDialog(false)
+                    },
+                ) {
+                    Text("Нет")
+                }
+            },
+        )
+    }
+}
+
+fun deleteNotification(
+    context: Context,
+    token: String,
+    index: Int,
+    notificationList: MutableState<MutableList<Notification>>
+) {
+    val url = MainActivity.prefixUrl + "/notifications/${notificationList.value.get(index).id}"
+    val queue = Volley.newRequestQueue(context)
+    val stringRequest = object : StringRequest(
+        Method.DELETE,
+        url,
+        {
+            Log.d("MyLog", "Notification with notificationId:$index and user token: $token deleted")
+            getNotificationList(context, token, notificationList)
+        },
+        { error ->
+            Log.d("MyLog", "Error $error")
+        }) {
+        override fun getHeaders(): MutableMap<String, String> {
+            val headers = HashMap<String, String>()
+            headers["Authorization"] = token
+            return headers
+        }
+    }
+    queue.add(stringRequest)
+}
+
+@Composable
+fun showInviteDialog(
     showDialog: Boolean,
     setShowDialog: (Boolean) -> Unit,
     context: Context,

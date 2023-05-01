@@ -1,38 +1,23 @@
 package com.example.petschedule.services
 
-import android.annotation.SuppressLint
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
-import android.widget.RemoteViews
 import android.widget.Toast
-import androidx.annotation.IntegerRes
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.example.petschedule.MainActivity
 import com.example.petschedule.R
-import com.example.petschedule.composables.Screen
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import org.json.JSONObject
-import java.util.HashMap
-import java.util.concurrent.TimeUnit
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 

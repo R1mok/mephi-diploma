@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -214,7 +215,7 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
                             ),
                             modifier = Modifier
                                 .clickable(onClick = {
-                                    petType = "Dog"
+                                    petType = "Собака"
                                     isExpandedPetType = false
                                 })
                         )
@@ -226,7 +227,7 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
                             ),
                             modifier = Modifier
                                 .clickable(onClick = {
-                                    petType = "Cat"
+                                    petType = "Кошка"
                                     isExpandedPetType = false
                                 })
                         )
@@ -270,26 +271,26 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
                             .fillMaxWidth(0.2f)
                     ) {
                         Text(
-                            text = "Мужской",
+                            text = "Самец",
                             style = TextStyle(
                                 fontSize = 20.sp,
                                 color = Color.DarkGray
                             ),
                             modifier = Modifier
                                 .clickable(onClick = {
-                                    petGender = "Male"
+                                    petGender = "Самец"
                                     isExpandedPetGender = false
                                 })
                         )
                         Text(
-                            text = "Женский",
+                            text = "Самка",
                             style = TextStyle(
                                 fontSize = 20.sp,
                                 color = Color.DarkGray
                             ),
                             modifier = Modifier
                                 .clickable(onClick = {
-                                    petGender = "Female"
+                                    petGender = "Самка"
                                     isExpandedPetGender = false
                                 })
                         )
@@ -481,7 +482,7 @@ fun GroupScreen(navController: NavController, token: String, groupId: String, na
                     )
                 ) {
                     Text(
-                        text = "${pet.id}: ${pet.name}",
+                        text = pet.name,
                         color = Color.DarkGray,
                         fontSize = 30.sp
                     )
@@ -502,11 +503,13 @@ fun createPet(
     petGender: String,
     bornDate: MutableState<String>
 ) {
+    val originalPetType = if (petType == "Кошка") "CAT" else "DOG"
+    val originalPetGender = if (petGender == "Самец") "MALE" else "FEMALE"
     val url = MainActivity.prefixUrl + "/pets/createPet?" +
             "groupId=$id" +
             "&name=$name" +
-            "&gender=${petGender.uppercase()}" +
-            "&petType=${petType.uppercase()}" +
+            "&gender=${originalPetGender.uppercase()}" +
+            "&petType=${originalPetType.uppercase()}" +
             "&bornDate=${bornDate.value}"
     val queue = Volley.newRequestQueue(context)
     val stringRequest = object : StringRequest(

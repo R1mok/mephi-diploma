@@ -555,8 +555,8 @@ fun PetScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 5.dp),
-                    border = BorderStroke(1.dp, Color.White),
-                    backgroundColor = Color.Transparent
+                    border = BorderStroke(2.dp, Color.Black),
+                    backgroundColor = Color.White
                 ) {
                     Text(
                         text = note.comment,
@@ -586,8 +586,8 @@ fun getPetById(
         url,
         { response ->
             var obj = JSONObject(response)
-            petType.value = obj.getString("type").toString()
-            petGender.value = obj.getString("gender").toString()
+            petType.value = if (obj.getString("type").toString() == "DOG") "Собака" else "Кошка"
+            petGender.value = if (obj.getString("gender").toString() == "MALE") "Самец" else "Самка"
             petDescription.value = obj.getString("description").toString()
             petBornDate.value = obj.getString("bornDate").toString()
         },
