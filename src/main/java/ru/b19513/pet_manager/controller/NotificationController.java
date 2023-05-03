@@ -40,8 +40,8 @@ public class NotificationController {
     @Operation(summary = "Добавить новое напоминание типа Schedule.")
     @PostMapping("/schedule/")
     public ResponseEntity<StatusDTO> postNotificationSchedule(@RequestParam long groupId, @RequestParam String comment,
-                                                                            @RequestParam long petId, @RequestParam LocalTime time) {
-        return ResponseEntity.ok(notificationService.createNotificationSchedule(groupId, petId, comment, time));
+                                                                            @RequestParam long petId, @RequestParam String time) {
+        return ResponseEntity.ok(notificationService.createNotificationSchedule(groupId, petId, comment, LocalTime.parse(time)));
     }
 
     @Operation(summary = "Изменить напоминание.")
