@@ -22,16 +22,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String[] AUTH_WHITELIST = {
             // -- Swagger UI v2
-            "/v2/api-docs",
-            "/swagger-resources",
-            "/swagger-resources/**",
-            "/configuration/ui",
-            "/configuration/security",
-            "/swagger-ui.html",
-            "/webjars/**",
+            "/shelter/v2/api-docs",
+            "/shelter/swagger-resources",
+            "/shelter/swagger-resources/**",
+            "/shelter/configuration/ui",
+            "/shelter/configuration/security",
+            "/shelter/swagger-ui.html",
+            "/shelter/webjars/**",
             // -- Swagger UI v3 (OpenAPI)
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
+            "/shelter/v3/api-docs/**",
+            "/shelter/swagger-ui/**",
             // other public endpoints of your API may be appended to this array
             "/shelter/auth/login",
             "/shelter/user/checkLogin/**",
